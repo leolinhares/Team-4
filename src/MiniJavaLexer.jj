@@ -1,0 +1,50 @@
+options {
+  JAVA_UNICODE_ESCAPE = true;
+}
+
+PARSER_BEGIN(MiniJavaParser)
+  public class MiniJavaParser {}
+PARSER_END(MiniJavaParser)
+
+/* For the regular expressions on the right, the token on the left will be returned: */
+TOKEN : {
+< IF: "if" >
+| < #DIGIT: ["0"-"9"] >
+| < ID: ["a"-"z"] (["a"-"z"]|<DIGIT>)* >
+| < NUM: (<DIGIT>)+ >
+| < REAL: ( (<DIGIT>)+ "." (<DIGIT>)* ) |
+( (<DIGIT>)* "." (<DIGIT>)+ )>
+}
+/* The regular expressions here will be skipped during lexical analysis: */
+SKIP : {
+<"--" (["a"-"z"])* ("\n" | "\r" | "\r\n")>
+| " "
+| "\t"
+| "\n"
+}
+
+
+
+// Insert a specification of a lexical analysis here. 
+
+
+// The following is a simple grammar that will allow you
+// to test the generated lexer.
+
+
+void Goal() :
+{}
+{
+  ( MiniJavaToken() )*
+  <EOF>
+}
+
+void MiniJavaToken():
+{}
+{
+
+  <IF> | <ID> | <NUM> | <REAL>
+//  "class"  |  <IDENTIFIER> | "{" | "public" | "static" | "void" |//  "main" | "(" | "String"  | "[" | "]" | ")" | "}" | "extends" | ";"//  | "return" | "," | "int" | "boolean" | "=" | "if" | "else" | "while"//  | "System.out.println" | "&&" | "<" | "+" | "-" | "*" | "." |//  "length" | <INTEGER_LITERAL> | "true" | "false" | "this" | "new" |//  "!"
+}
+
+
