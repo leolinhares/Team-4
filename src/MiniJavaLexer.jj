@@ -45,25 +45,27 @@ TOKEN : {
 | < MINUS: "-" >
 | < STAR: "*" >
 | < ASSIGN: "=" >
- 
-//| < OP: (<AND>|<LT>|<PLUS>|<MINUS>|<STAR>) >
-| < IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>|"_")* >
-| < INTEGER_LITERAL: (<DIGIT>)+ >
 }
-/* The regular expressions here will be skipped during lexical analysis: */
+
+TOKEN : { 
+< IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>|"_")* >
+| < INTEGER_LITERAL: (["1"-"9"](<DIGIT>)*) | "0">
+}
+
+
+/* The regular expressions here will be skipped during lexical analysis: white space*/
 SKIP : {
-<"--" (<LETTER>)* ("\n" | "\r" | "\r\n")>
-| " "
+" "
 | "\t"
 | "\n"
+| "\r"
+| "\f"
 }
 
-// Insert a specification of a lexical analysis here. 
-
-
-// The following is a simple grammar that will allow you
-// to test the generated lexer.
-
+SPECIAL_TOKEN : {
+  <SINGLE_LINE_COMMENT: "//" (~["\n","\r"])* ("\n"|"\r"|"\r\n")>
+| <MULTI_LINE_COMMENT: "/*" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
+}
 
 void Goal() :
 {}
