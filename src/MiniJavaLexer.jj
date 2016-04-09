@@ -8,22 +8,55 @@ PARSER_END(MiniJavaParser)
 
 /* For the regular expressions on the right, the token on the left will be returned: */
 TOKEN : {
-< IF: "if" >
-| < #DIGIT: ["0"-"9"] >
-| < ID: ["a"-"z"] (["a"-"z"]|<DIGIT>)* >
-| < NUM: (<DIGIT>)+ >
-| < REAL: ( (<DIGIT>)+ "." (<DIGIT>)* ) |
-( (<DIGIT>)* "." (<DIGIT>)+ )>
+< #DIGIT: ["0"-"9"] >
+| < #LETTER: (["a"-"z"]|["A"-"Z"]) >
+| < LPAREN: "(" >
+| < RPAREN: ")" >
+| < LBRACK: "[" >
+| < RBRACK: "]" >
+| < LBRACE: "{" >
+| < RBRACE: "}" >
+| < SEMI: ";" >
+| < COMMA: "," >
+| < IF: "if" >
+| < ELSE: "else" >
+| < WHILE: "while" >
+| < EXTENDS: "extends" >
+| < RETURN: "return" >
+| < CLASS: "class" >
+| < PUBLIC: "public" >
+| < STATIC: "static" >
+| < VOID: "void" >
+| < MAIN: "main" >
+| < THIS: "this" >
+| < NEW: "new" >
+| < NOT: "!" >
+| < STRING: "String" >
+| < BOOLEAN: "boolean" >
+| < INT: "int" >
+| < TRUE: "true" >
+| < FALSE: "false" >
+| < LENGTH: "length" >
+| < DOT: "." >
+| < SYSO: "System.out.println" >
+| < AND: "&&" >
+| < LT: "<" > 
+| < PLUS: "+" >
+| < MINUS: "-" >
+| < STAR: "*" >
+| < ASSIGN: "=" >
+ 
+//| < OP: (<AND>|<LT>|<PLUS>|<MINUS>|<STAR>) >
+| < IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>|"_")* >
+| < INTEGER_LITERAL: (<DIGIT>)+ >
 }
 /* The regular expressions here will be skipped during lexical analysis: */
 SKIP : {
-<"--" (["a"-"z"])* ("\n" | "\r" | "\r\n")>
+<"--" (<LETTER>)* ("\n" | "\r" | "\r\n")>
 | " "
 | "\t"
 | "\n"
 }
-
-
 
 // Insert a specification of a lexical analysis here. 
 
@@ -43,8 +76,12 @@ void MiniJavaToken():
 {}
 {
 
-  <IF> | <ID> | <NUM> | <REAL>
-//  "class"  |  <IDENTIFIER> | "{" | "public" | "static" | "void" |//  "main" | "(" | "String"  | "[" | "]" | ")" | "}" | "extends" | ";"//  | "return" | "," | "int" | "boolean" | "=" | "if" | "else" | "while"//  | "System.out.println" | "&&" | "<" | "+" | "-" | "*" | "." |//  "length" | <INTEGER_LITERAL> | "true" | "false" | "this" | "new" |//  "!"
+  "class"  |  <IDENTIFIER> | "{" | "public" | "static" | "void" |
+  "main" | "(" | "String"  | "[" | "]" | ")" | "}" | "extends" | ";"
+  | "return" | "," | "int" | "boolean" | "=" | "if" | "else" | "while"
+  | "System.out.println" | "&&" | "<" | "+" | "-" | "*" | "." |
+  "length" | <INTEGER_LITERAL> | "true" | "false" | "this" | "new" |
+  "!"
 }
 
 

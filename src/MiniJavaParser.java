@@ -10,10 +10,43 @@
     label_1:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case LPAREN:
+      case RPAREN:
+      case LBRACK:
+      case RBRACK:
+      case LBRACE:
+      case RBRACE:
+      case SEMI:
+      case COMMA:
       case IF:
-      case ID:
-      case NUM:
-      case REAL:
+      case ELSE:
+      case WHILE:
+      case EXTENDS:
+      case RETURN:
+      case CLASS:
+      case PUBLIC:
+      case STATIC:
+      case VOID:
+      case MAIN:
+      case THIS:
+      case NEW:
+      case NOT:
+      case STRING:
+      case BOOLEAN:
+      case INT:
+      case TRUE:
+      case FALSE:
+      case LENGTH:
+      case DOT:
+      case SYSO:
+      case AND:
+      case LT:
+      case PLUS:
+      case MINUS:
+      case STAR:
+      case ASSIGN:
+      case IDENTIFIER:
+      case INTEGER_LITERAL:
         ;
         break;
       default:
@@ -27,17 +60,116 @@
 
   static final public void MiniJavaToken() throws ParseException {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case CLASS:
+      jj_consume_token(CLASS);
+      break;
+    case IDENTIFIER:
+      jj_consume_token(IDENTIFIER);
+      break;
+    case LBRACE:
+      jj_consume_token(LBRACE);
+      break;
+    case PUBLIC:
+      jj_consume_token(PUBLIC);
+      break;
+    case STATIC:
+      jj_consume_token(STATIC);
+      break;
+    case VOID:
+      jj_consume_token(VOID);
+      break;
+    case MAIN:
+      jj_consume_token(MAIN);
+      break;
+    case LPAREN:
+      jj_consume_token(LPAREN);
+      break;
+    case STRING:
+      jj_consume_token(STRING);
+      break;
+    case LBRACK:
+      jj_consume_token(LBRACK);
+      break;
+    case RBRACK:
+      jj_consume_token(RBRACK);
+      break;
+    case RPAREN:
+      jj_consume_token(RPAREN);
+      break;
+    case RBRACE:
+      jj_consume_token(RBRACE);
+      break;
+    case EXTENDS:
+      jj_consume_token(EXTENDS);
+      break;
+    case SEMI:
+      jj_consume_token(SEMI);
+      break;
+    case RETURN:
+      jj_consume_token(RETURN);
+      break;
+    case COMMA:
+      jj_consume_token(COMMA);
+      break;
+    case INT:
+      jj_consume_token(INT);
+      break;
+    case BOOLEAN:
+      jj_consume_token(BOOLEAN);
+      break;
+    case ASSIGN:
+      jj_consume_token(ASSIGN);
+      break;
     case IF:
       jj_consume_token(IF);
       break;
-    case ID:
-      jj_consume_token(ID);
+    case ELSE:
+      jj_consume_token(ELSE);
       break;
-    case NUM:
-      jj_consume_token(NUM);
+    case WHILE:
+      jj_consume_token(WHILE);
       break;
-    case REAL:
-      jj_consume_token(REAL);
+    case SYSO:
+      jj_consume_token(SYSO);
+      break;
+    case AND:
+      jj_consume_token(AND);
+      break;
+    case LT:
+      jj_consume_token(LT);
+      break;
+    case PLUS:
+      jj_consume_token(PLUS);
+      break;
+    case MINUS:
+      jj_consume_token(MINUS);
+      break;
+    case STAR:
+      jj_consume_token(STAR);
+      break;
+    case DOT:
+      jj_consume_token(DOT);
+      break;
+    case LENGTH:
+      jj_consume_token(LENGTH);
+      break;
+    case INTEGER_LITERAL:
+      jj_consume_token(INTEGER_LITERAL);
+      break;
+    case TRUE:
+      jj_consume_token(TRUE);
+      break;
+    case FALSE:
+      jj_consume_token(FALSE);
+      break;
+    case THIS:
+      jj_consume_token(THIS);
+      break;
+    case NEW:
+      jj_consume_token(NEW);
+      break;
+    case NOT:
+      jj_consume_token(NOT);
       break;
     default:
       jj_la1[1] = jj_gen;
@@ -58,11 +190,16 @@
   static private int jj_gen;
   static final private int[] jj_la1 = new int[2];
   static private int[] jj_la1_0;
+  static private int[] jj_la1_1;
   static {
       jj_la1_init_0();
+      jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x3a,0x3a,};
+      jj_la1_0 = new int[] {0xfffffff8,0xfffffff8,};
+   }
+   private static void jj_la1_init_1() {
+      jj_la1_1 = new int[] {0xff,0xff,};
    }
 
   /** Constructor with InputStream. */
@@ -200,7 +337,7 @@
   /** Generate ParseException. */
   static public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[10];
+    boolean[] la1tokens = new boolean[44];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -211,10 +348,13 @@
           if ((jj_la1_0[i] & (1<<j)) != 0) {
             la1tokens[j] = true;
           }
+          if ((jj_la1_1[i] & (1<<j)) != 0) {
+            la1tokens[32+j] = true;
+          }
         }
       }
     }
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 44; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;
