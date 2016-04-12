@@ -141,7 +141,7 @@ public interface MiniJavaParserConstants {
     "\"\\n\"",
     "\"\\r\"",
     "\"\\f\"",
-    "\"\\r\\n\"",
+    "\"\\n\\r\"",
     "<SINGLE_LINE_COMMENT>",
     "<MULTI_LINE_COMMENT>",
   };

@@ -68,21 +68,107 @@ SPECIAL_TOKEN : {
 | <MULTI_LINE_COMMENT: "/*" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
 }
 
-void Goal() :
+void Program() :
 {}
 {
-  ( MiniJavaToken() )*
-  <EOF>
+	MainClass() (ClassDecl())*
+	<EOF>
 }
 
-void MiniJavaToken():
+void MainClass() :
 {}
 {
+	<CLASS> <IDENTIFIER> <LBRACE> <PUBLIC> <STATIC> <VOID> <MAIN> <LPAREN> <STRING> <LBRACK> <RBRACK> <IDENTIFIER> <RPAREN> <LBRACE> Statement() <RBRACE> <RBRACE>
+}
 
-  "class"  |  <IDENTIFIER> | "{" | "public" | "static" | "void" |
-  "main" | "(" | "String"  | "[" | "]" | ")" | "}" | "extends" | ";"
-  | "return" | "," | "int" | "boolean" | "=" | "if" | "else" | "while"
-  | "System.out.println" | "&&" | "<" | "+" | "-" | "*" | "." |
-  "length" | <INTEGER_LITERAL> | "true" | "false" | "this" | "new" |
-  "!"
+void ClassDecl() :
+{}
+{
+	LOOKAHEAD(3)<CLASS> <IDENTIFIER> <LBRACE> (VarDecl())* (MethodDecl())* <RBRACE> |
+	LOOKAHEAD(3)<CLASS> <IDENTIFIER> <EXTENDS> <IDENTIFIER> <LBRACE> (VarDecl())* (MethodDecl())* <RBRACE>
+}
+
+void VarDecl() :
+{}
+{
+	Type() <IDENTIFIER> <SEMI>
+}
+
+void MethodDecl() :
+{}
+{
+	<PUBLIC> Type() <IDENTIFIER> <LPAREN> FormalList() <RPAREN> <LBRACE> (LOOKAHEAD(2)VarDecl())* (Statement())* <RETURN> Exp() <SEMI> <RBRACE>
+}
+
+void FormalList() :
+{}
+{
+	(Type() <IDENTIFIER> (FormalRest())*)?
+}
+
+void FormalRest() :
+{}
+{
+	<COMMA> Type() <IDENTIFIER>
+}
+
+void Type() :
+{}
+{
+	LOOKAHEAD(2)<INT> <LBRACK> <RBRACK> | <BOOLEAN> | LOOKAHEAD(2)<INT> | <IDENTIFIER>
+}
+
+void Statement() :
+{}
+{
+	<LBRACE> (Statement())* <RBRACE> |
+	<IF> <LPAREN> Exp() <RPAREN> Statement() <ELSE> Statement() |
+	<WHILE> <LPAREN> Exp() <RPAREN> Statement() |
+	<SYSO> <LPAREN> Exp() <RPAREN> <SEMI> |
+	LOOKAHEAD(2)<IDENTIFIER> <ASSIGN> Exp() <SEMI> |
+	LOOKAHEAD(2)<IDENTIFIER> <LBRACK> Exp() <RBRACK> <ASSIGN> Exp() <SEMI>
+}
+
+void Exp() :
+{}
+{
+  	And()
+}
+
+void And():{}{	LessThan() ( <AND> LessThan() )*
+}
+
+void LessThan():{}{	AdditiveExp()[ <LT> AdditiveExp()]
+}
+
+void AdditiveExp():{}{	Times() ((< PLUS>|< MINUS>) Times())*
+}
+
+void Times():{}{	PrefixExp() (<STAR> PrefixExp())*
+}
+
+void PrefixExp():{}{	Not() | PostfixExp()
+}
+
+void Not():{}{
+  (<NOT>)+ PostfixExp()}
+
+void PostfixExp():{}{	PrimaryExp()(<LBRACK> Exp() <RBRACK> |
+	 LOOKAHEAD(2)<DOT> <IDENTIFIER> <LPAREN> ExpList() <RPAREN>|
+	 LOOKAHEAD(2)<DOT> <LENGTH>)*
+}
+
+void PrimaryExp():{}{	<INTEGER_LITERAL > |	<TRUE> |	<FALSE> |	<IDENTIFIER> |	<THIS> |	LOOKAHEAD(2)<NEW> <INT> <LBRACK> Exp() <RBRACK> |	LOOKAHEAD(2)<NEW> <IDENTIFIER> <LPAREN> <RPAREN> |	<LPAREN> Exp() <RPAREN>
+}
+
+void ExpList() :
+{}
+{
+	(Exp() (ExpRest())*)?
+}
+
+void ExpRest() :
+{}
+{
+	<COMMA> Exp()
 }
