@@ -40,14 +40,14 @@ TOKEN : {
 | < DOT: "." >
 | < SYSO: "System.out.println" >
 | < AND: "&&" >
-| < LT: "<" > 
+| < LT: "<" >
 | < PLUS: "+" >
 | < MINUS: "-" >
 | < STAR: "*" >
 | < ASSIGN: "=" >
 }
 
-TOKEN : { 
+TOKEN : {
 < IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>|"_")* >
 | < INTEGER_LITERAL: (["1"-"9"](<DIGIT>)*) | "0">
 }
@@ -60,6 +60,7 @@ SKIP : {
 | "\n"
 | "\r"
 | "\f"
+| "\r\n"
 }
 
 SPECIAL_TOKEN : {
@@ -85,5 +86,3 @@ void MiniJavaToken():
   "length" | <INTEGER_LITERAL> | "true" | "false" | "this" | "new" |
   "!"
 }
-
-

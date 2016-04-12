@@ -87,9 +87,9 @@ public interface MiniJavaParserConstants {
   /** RegularExpression Id. */
   int INTEGER_LITERAL = 39;
   /** RegularExpression Id. */
-  int SINGLE_LINE_COMMENT = 45;
+  int SINGLE_LINE_COMMENT = 46;
   /** RegularExpression Id. */
-  int MULTI_LINE_COMMENT = 46;
+  int MULTI_LINE_COMMENT = 47;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -141,6 +141,7 @@ public interface MiniJavaParserConstants {
     "\"\\n\"",
     "\"\\r\"",
     "\"\\f\"",
+    "\"\\r\\n\"",
     "<SINGLE_LINE_COMMENT>",
     "<MULTI_LINE_COMMENT>",
   };
