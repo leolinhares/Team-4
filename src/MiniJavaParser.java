@@ -595,6 +595,12 @@
     finally { jj_save(10, xla); }
   }
 
+  static private boolean jj_3_7() {
+    if (jj_scan_token(IDENTIFIER)) return true;
+    if (jj_scan_token(LBRACK)) return true;
+    return false;
+  }
+
   static private boolean jj_3_6() {
     if (jj_scan_token(IDENTIFIER)) return true;
     if (jj_scan_token(ASSIGN)) return true;
@@ -606,7 +612,19 @@
     return false;
   }
 
+  static private boolean jj_3_11() {
+    if (jj_scan_token(NEW)) return true;
+    if (jj_scan_token(IDENTIFIER)) return true;
+    return false;
+  }
+
   static private boolean jj_3_5() {
+    if (jj_scan_token(INT)) return true;
+    return false;
+  }
+
+  static private boolean jj_3_10() {
+    if (jj_scan_token(NEW)) return true;
     if (jj_scan_token(INT)) return true;
     return false;
   }
@@ -627,12 +645,6 @@
     return false;
   }
 
-  static private boolean jj_3_9() {
-    if (jj_scan_token(DOT)) return true;
-    if (jj_scan_token(LENGTH)) return true;
-    return false;
-  }
-
   static private boolean jj_3_4() {
     if (jj_scan_token(INT)) return true;
     if (jj_scan_token(LBRACK)) return true;
@@ -645,9 +657,9 @@
     return false;
   }
 
-  static private boolean jj_3_8() {
+  static private boolean jj_3_9() {
     if (jj_scan_token(DOT)) return true;
-    if (jj_scan_token(IDENTIFIER)) return true;
+    if (jj_scan_token(LENGTH)) return true;
     return false;
   }
 
@@ -658,28 +670,16 @@
     return false;
   }
 
+  static private boolean jj_3_8() {
+    if (jj_scan_token(DOT)) return true;
+    if (jj_scan_token(IDENTIFIER)) return true;
+    return false;
+  }
+
   static private boolean jj_3_1() {
     if (jj_scan_token(CLASS)) return true;
     if (jj_scan_token(IDENTIFIER)) return true;
     if (jj_scan_token(LBRACE)) return true;
-    return false;
-  }
-
-  static private boolean jj_3_11() {
-    if (jj_scan_token(NEW)) return true;
-    if (jj_scan_token(IDENTIFIER)) return true;
-    return false;
-  }
-
-  static private boolean jj_3_10() {
-    if (jj_scan_token(NEW)) return true;
-    if (jj_scan_token(INT)) return true;
-    return false;
-  }
-
-  static private boolean jj_3_7() {
-    if (jj_scan_token(IDENTIFIER)) return true;
-    if (jj_scan_token(LBRACK)) return true;
     return false;
   }
 

@@ -71,8 +71,7 @@ SPECIAL_TOKEN : {
 void Program() :
 {}
 {
-	MainClass() (ClassDecl())*
-	<EOF>
+	MainClass() (ClassDecl())* <EOF>
 }
 
 void MainClass() :
@@ -135,30 +134,30 @@ void Exp() :
   	And()
 }
 
-void And():{}{	LessThan() ( <AND> LessThan() )*
+void And() :{}{	LessThan() ( <AND> LessThan() )*
 }
 
-void LessThan():{}{	AdditiveExp()[ <LT> AdditiveExp()]
+void LessThan() :{}{	AdditiveExp()[ <LT> AdditiveExp()]
 }
 
-void AdditiveExp():{}{	Times() ((< PLUS>|< MINUS>) Times())*
+void AdditiveExp() :{}{	Times() ((< PLUS>|< MINUS>) Times())*
 }
 
-void Times():{}{	PrefixExp() (<STAR> PrefixExp())*
+void Times() :{}{	PrefixExp() (<STAR> PrefixExp())*
 }
 
-void PrefixExp():{}{	Not() | PostfixExp()
+void PrefixExp() :{}{	Not() | PostfixExp()
 }
 
-void Not():{}{
+void Not() :{}{
   (<NOT>)+ PostfixExp()}
 
-void PostfixExp():{}{	PrimaryExp()(<LBRACK> Exp() <RBRACK> |
+void PostfixExp() :{}{	PrimaryExp()(<LBRACK> Exp() <RBRACK> |
 	 LOOKAHEAD(2)<DOT> <IDENTIFIER> <LPAREN> ExpList() <RPAREN>|
 	 LOOKAHEAD(2)<DOT> <LENGTH>)*
 }
 
-void PrimaryExp():{}{	<INTEGER_LITERAL > |	<TRUE> |	<FALSE> |	<IDENTIFIER> |	<THIS> |	LOOKAHEAD(2)<NEW> <INT> <LBRACK> Exp() <RBRACK> |	LOOKAHEAD(2)<NEW> <IDENTIFIER> <LPAREN> <RPAREN> |	<LPAREN> Exp() <RPAREN>
+void PrimaryExp() :{}{	<INTEGER_LITERAL > |	<TRUE> |	<FALSE> |	<IDENTIFIER> |	<THIS> |	LOOKAHEAD(2)<NEW> <INT> <LBRACK> Exp() <RBRACK> |	LOOKAHEAD(2)<NEW> <IDENTIFIER> <LPAREN> <RPAREN> |	<LPAREN> Exp() <RPAREN>
 }
 
 void ExpList() :
