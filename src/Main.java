@@ -9,7 +9,7 @@ public class Main {
 
 	public static void main(String [] args) throws FileNotFoundException {
 		try {
-			File file = new File("src/file.txt");
+			File file = new File("src/file3.txt");
 
 			Program root = new MiniJavaParser(new FileInputStream(file)).Goal();
 			System.out.println("Lexical analysis successfull");

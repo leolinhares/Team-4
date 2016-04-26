@@ -207,17 +207,80 @@ Identifier Identifier():{Token t;}{
   {return new Identifier(t.image);}
 }
 
-void Statement() :
-{}
+
+Statement Statement() :
+{ Statement s; }
 {
-	<LBRACE> (Statement())* <RBRACE> |
-	<IF> <LPAREN> Exp() <RPAREN> Statement() <ELSE> Statement() |
-	<WHILE> <LPAREN> Exp() <RPAREN> Statement() |
-	<SYSO> <LPAREN> Exp() <RPAREN> <SEMI> |
-	LOOKAHEAD(2)<IDENTIFIER> <ASSIGN> Exp() <SEMI> |
-	LOOKAHEAD(2)<IDENTIFIER> <LBRACK> Exp() <RBRACK> <ASSIGN> Exp() <SEMI>
+  (
+  s=Block()
+| 
+  LOOKAHEAD(2)
+  s=AssignmentStatement()
+|
+  LOOKAHEAD(2)
+  s=ArrayAssignmentStatement()
+|
+  s=IfStatement()
+|
+  s=WhileStatement()
+|
+  s=PrintStatement()
+  )
+  { return s; }
 }
 
+Statement Block() :
+{ 
+  Statement s;
+  StatementList sl = new StatementList(); 
+}
+{
+  < LBRACE> ( s=Statement() { sl.addElement(s); } )* < RBRACE>
+  { return new Block(sl); }
+}
+
+Statement ArrayAssignmentStatement() :
+{ Identifier i;
+  Exp e1,e2;
+}
+{
+  i=Identifier() < LBRACK> e1=Exp() <RBRACK> <ASSIGN> e2=Exp() <SEMI>
+  { return new ArrayAssign(i,e1,e2); }
+}
+
+Statement AssignmentStatement() :
+{ Identifier i;
+  Exp e;
+}
+{
+  i=Identifier() <ASSIGN> e=Exp() <SEMI>
+  { return new Assign(i,e); }
+}
+
+Statement IfStatement() :
+{ Exp e;
+  Statement s1,s2;
+}
+{
+  <IF> <LPAREN> e=Exp() <RPAREN> s1=Statement() <ELSE> s2=Statement() 
+  { return new If(e,s1,s2); }
+}
+
+Statement WhileStatement() :
+{ Exp e;
+  Statement s;
+}
+{
+  <WHILE> <LPAREN> e=Exp() <RPAREN> s=Statement()  
+  { return new While(e,s); }
+}
+
+Statement PrintStatement() :
+{ Exp e; }
+{
+  < SYSO > <LPAREN> e=Exp() <RPAREN> <SEMI>
+  { return new Print(e); }
+}
 
 Exp Exp() :
 { Exp e; }
