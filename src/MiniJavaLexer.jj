@@ -3,6 +3,7 @@ options {
 }
 
 PARSER_BEGIN(MiniJavaParser)
+  import syntaxtree.*;
   public class MiniJavaParser {}
 PARSER_END(MiniJavaParser)
 
@@ -68,35 +69,74 @@ SPECIAL_TOKEN : {
 | <MULTI_LINE_COMMENT: "/*" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
 }
 
-void Program() :
-{}
+Program Goal() :
 {
-	MainClass() (ClassDecl())* <EOF>
+  MainClass m;
+  ClassDeclList cl = new ClassDeclList();
+  ClassDecl c;
+}
+{
+	m = MainClass() (c=ClassDecl(){cl.addElement(c);})*
+	<EOF>
+	{return new Program(m,cl);}
 }
 
-void MainClass() :
-{}
+MainClass MainClass() :
 {
-	<CLASS> <IDENTIFIER> <LBRACE> <PUBLIC> <STATIC> <VOID> <MAIN> <LPAREN> <STRING> <LBRACK> <RBRACK> <IDENTIFIER> <RPAREN> <LBRACE> Statement() <RBRACE> <RBRACE>
+	Statement s;
+	Identifier i1;
+	Identifier i2;
 }
 
-void ClassDecl() :
-{}
 {
-	LOOKAHEAD(3)<CLASS> <IDENTIFIER> <LBRACE> (VarDecl())* (MethodDecl())* <RBRACE> |
-	LOOKAHEAD(3)<CLASS> <IDENTIFIER> <EXTENDS> <IDENTIFIER> <LBRACE> (VarDecl())* (MethodDecl())* <RBRACE>
+	<CLASS> i1=Identifier() <LBRACE> <PUBLIC> <STATIC> <VOID> <MAIN> <LPAREN> <STRING> <LBRACK> <RBRACK> i2=Identifier() <RPAREN> <LBRACE> s = Statement() <RBRACE> <RBRACE>
+	{return new MainClass(i1,i2,s);}
 }
 
-void VarDecl() :
-{}
+ClassDecl ClassDecl() :
+{ClassDecl c;}
+{	(LOOKAHEAD(3) c = ClassDeclarationSimple() | c = ClassDeclarationExtends())
+	{return c;}
+}
+
+ClassDecl ClassDeclarationSimple():
 {
-	Type() <IDENTIFIER> <SEMI>
+Identifier i;
+VarDecl v; VarDeclList vl = new VarDeclList();
+MethodDecl m; MethodDeclList ml = new MethodDeclList();}
+{
+  <CLASS> i = Identifier() <LBRACE> (v = VarDecl(){vl.addElement(v);})* (m = MethodDecl(){ml.addElement(m);})* <RBRACE>{return new ClassDeclSimple(i,vl,ml);}
+}
+
+ClassDecl ClassDeclarationExtends():
+{
+Identifier i1,i2;
+VarDecl v; VarDeclList vl = new VarDeclList();
+MethodDecl m; MethodDeclList ml = new MethodDeclList();
+}
+{
+  <CLASS> i1 = Identifier() <EXTENDS> i2 = Identifier() <LBRACE> (v = VarDecl(){vl.addElement(v);})* (m = MethodDecl(){ml.addElement(m);})* <RBRACE>{return new ClassDeclExtends(i1,i2,vl,ml);}
+}
+
+VarDecl VarDecl() :
+{Type t; Identifier i;}
+{
+	t = Type() i = Identifier() <SEMI>
+	{return new VarDecl(t,i);}
 }
 
 void MethodDecl() :
-{}
 {
-	<PUBLIC> Type() <IDENTIFIER> <LPAREN> FormalList() <RPAREN> <LBRACE> (LOOKAHEAD(2)VarDecl())* (Statement())* <RETURN> Exp() <SEMI> <RBRACE>
+  /*Type t; Identifier i;
+  FormalList fl = new FormalList();
+  VarDecl v; VarDeclList vl = new VarDeclList();
+  Statement s;
+  StatementList sl = new StatementList();
+  Exp e;*/
+}
+{
+	<PUBLIC> Type() Identifier()
+	<LPAREN> FormalList() <RPAREN> <LBRACE> (LOOKAHEAD(2)VarDecl())* (Statement())* <RETURN> Exp() <SEMI> <RBRACE>
 }
 
 void FormalList() :
@@ -114,7 +154,12 @@ void FormalRest() :
 void Type() :
 {}
 {
-	LOOKAHEAD(2)<INT> <LBRACK> <RBRACK> | <BOOLEAN> | LOOKAHEAD(2)<INT> | <IDENTIFIER>
+	LOOKAHEAD(2)<INT> <LBRACK> <RBRACK> | <BOOLEAN> | LOOKAHEAD(2)<INT> | Identifier()
+}
+
+Identifier Identifier():{Token t;}{
+  t=<IDENTIFIER>
+  {return new Identifier(t.image);}
 }
 
 void Statement() :
