@@ -152,9 +152,35 @@ void FormalRest() :
 }
 
 void Type() :
+{Type t;}
+{
+	(LOOKAHEAD(3) t = ArrayType() | t = BooleanType() | t = IntegerType() | t = IdentifierType())
+	{return t;} }
+
+Type ArrayType() :
 {}
 {
-	LOOKAHEAD(2)<INT> <LBRACK> <RBRACK> | <BOOLEAN> | LOOKAHEAD(2)<INT> | Identifier()
+  <INT> <LBRACK> <RBRACK>
+  { return new IntArrayType(); }
+}
+
+Type BooleanType() :
+{}
+{
+	<BOOLEAN>
+  { return new BooleanType(); }
+}
+
+Type IntegerType():
+{}
+{	<INT>
+	{return new IntegerType();}}
+
+Type IdentifierType() :
+{ Token t; }
+{
+  t=<IDENTIFIER>
+  { return new IdentifierType(t.image); }
 }
 
 Identifier Identifier():{Token t;}{
