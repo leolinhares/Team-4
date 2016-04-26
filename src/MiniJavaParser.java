@@ -160,12 +160,27 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
     throw new Error("Missing return statement in function");
   }
 
-  static final public void MethodDecl() throws ParseException {
+  static final public MethodDecl MethodDecl() throws ParseException {
+  Type t; Identifier i;
+  FormalList fl = new FormalList();
+  VarDecl v; VarDeclList vl = new VarDeclList();
+  Statement s;
+  StatementList sl = new StatementList();
+  Exp e;
     jj_consume_token(PUBLIC);
-    Type();
-    Identifier();
+    t = Type();
+    i = Identifier();
     jj_consume_token(LPAREN);
-    FormalList();
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case BOOLEAN:
+    case INT:
+    case IDENTIFIER:
+      fl = FormalList();
+      break;
+    default:
+      jj_la1[6] = jj_gen;
+      ;
+    }
     jj_consume_token(RPAREN);
     jj_consume_token(LBRACE);
     label_6:
@@ -175,7 +190,8 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
       } else {
         break label_6;
       }
-      VarDecl();
+      v = VarDecl();
+                                             vl.addElement(v);
     }
     label_7:
     while (true) {
@@ -188,15 +204,18 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
         ;
         break;
       default:
-        jj_la1[6] = jj_gen;
+        jj_la1[7] = jj_gen;
         break label_7;
       }
-      Statement();
+      s = Statement();
+                         sl.addElement(s);
     }
     jj_consume_token(RETURN);
-    Exp();
+    e = Exp();
     jj_consume_token(SEMI);
     jj_consume_token(RBRACE);
+         {if (true) return new MethodDecl(t,i,fl,vl,sl,e);}
+    throw new Error("Missing return statement in function");
   }
 
   static final public FormalList FormalList() throws ParseException {
@@ -211,7 +230,7 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
         ;
         break;
       default:
-        jj_la1[7] = jj_gen;
+        jj_la1[8] = jj_gen;
         break label_8;
       }
       f = FormalRest();
@@ -239,32 +258,54 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
   }
 
   static final public void Type() throws ParseException {
-    if (jj_2_3(2)) {
-      jj_consume_token(INT);
-      jj_consume_token(LBRACK);
-      jj_consume_token(RBRACK);
+ Type t;
+    if (jj_2_3(3)) {
+      t = ArrayType();
     } else {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case BOOLEAN:
-        jj_consume_token(BOOLEAN);
+        t = BooleanType();
+        break;
+      case INT:
+        t = IntegerType();
+        break;
+      case IDENTIFIER:
+        t = IdentifierType();
         break;
       default:
-        jj_la1[8] = jj_gen;
-        if (jj_2_4(2)) {
-          jj_consume_token(INT);
-        } else {
-          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-          case IDENTIFIER:
-            Identifier();
-            break;
-          default:
-            jj_la1[9] = jj_gen;
-            jj_consume_token(-1);
-            throw new ParseException();
-          }
-        }
+        jj_la1[9] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
       }
     }
+         {if (true) return t;}
+  }
+
+  static final public Type ArrayType() throws ParseException {
+    jj_consume_token(INT);
+    jj_consume_token(LBRACK);
+    jj_consume_token(RBRACK);
+    {if (true) return new IntArrayType();}
+    throw new Error("Missing return statement in function");
+  }
+
+  static final public Type BooleanType() throws ParseException {
+    jj_consume_token(BOOLEAN);
+    {if (true) return new BooleanType();}
+    throw new Error("Missing return statement in function");
+  }
+
+  static final public Type IntegerType() throws ParseException {
+    jj_consume_token(INT);
+         {if (true) return new IntegerType();}
+    throw new Error("Missing return statement in function");
+  }
+
+  static final public Type IdentifierType() throws ParseException {
+  Token t;
+    t = jj_consume_token(IDENTIFIER);
+    {if (true) return new IdentifierType(t.image);}
+    throw new Error("Missing return statement in function");
   }
 
   static final public Identifier Identifier() throws ParseException {
@@ -321,12 +362,12 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
       break;
     default:
       jj_la1[11] = jj_gen;
-      if (jj_2_5(2)) {
+      if (jj_2_4(2)) {
         jj_consume_token(IDENTIFIER);
         jj_consume_token(ASSIGN);
         Exp();
         jj_consume_token(SEMI);
-      } else if (jj_2_6(2)) {
+      } else if (jj_2_5(2)) {
         jj_consume_token(IDENTIFIER);
         jj_consume_token(LBRACK);
         Exp();
@@ -479,13 +520,13 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
         break;
       default:
         jj_la1[20] = jj_gen;
-        if (jj_2_7(2)) {
+        if (jj_2_6(2)) {
           jj_consume_token(DOT);
           jj_consume_token(IDENTIFIER);
           jj_consume_token(LPAREN);
           ExpList();
           jj_consume_token(RPAREN);
-        } else if (jj_2_8(2)) {
+        } else if (jj_2_7(2)) {
           jj_consume_token(DOT);
           jj_consume_token(LENGTH);
         } else {
@@ -515,13 +556,13 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
       break;
     default:
       jj_la1[21] = jj_gen;
-      if (jj_2_9(2)) {
+      if (jj_2_8(2)) {
         jj_consume_token(NEW);
         jj_consume_token(INT);
         jj_consume_token(LBRACK);
         Exp();
         jj_consume_token(RBRACK);
-      } else if (jj_2_10(2)) {
+      } else if (jj_2_9(2)) {
         jj_consume_token(NEW);
         jj_consume_token(IDENTIFIER);
         jj_consume_token(LPAREN);
@@ -640,51 +681,39 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
     finally { jj_save(8, xla); }
   }
 
-  static private boolean jj_2_10(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_10(); }
-    catch(LookaheadSuccess ls) { return true; }
-    finally { jj_save(9, xla); }
-  }
-
-  static private boolean jj_3R_17() {
-    if (jj_3R_19()) return true;
-    if (jj_3R_18()) return true;
-    return false;
-  }
-
-  static private boolean jj_3_6() {
-    if (jj_scan_token(IDENTIFIER)) return true;
-    if (jj_scan_token(LBRACK)) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_16() {
-    if (jj_scan_token(CLASS)) return true;
-    if (jj_3R_18()) return true;
-    if (jj_scan_token(LBRACE)) return true;
-    return false;
-  }
-
-  static private boolean jj_3_5() {
+  static private boolean jj_3_4() {
     if (jj_scan_token(IDENTIFIER)) return true;
     if (jj_scan_token(ASSIGN)) return true;
     return false;
   }
 
-  static private boolean jj_3_1() {
-    if (jj_3R_16()) return true;
+  static private boolean jj_3R_17() {
+    if (jj_3R_20()) return true;
+    if (jj_3R_19()) return true;
     return false;
   }
 
-  static private boolean jj_3_10() {
-    if (jj_scan_token(NEW)) return true;
+  static private boolean jj_3R_21() {
+    if (jj_3R_24()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_19() {
     if (jj_scan_token(IDENTIFIER)) return true;
     return false;
   }
 
-  static private boolean jj_3_9() {
-    if (jj_scan_token(NEW)) return true;
+  static private boolean jj_3R_23() {
+    if (jj_3R_26()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_26() {
+    if (jj_scan_token(IDENTIFIER)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_25() {
     if (jj_scan_token(INT)) return true;
     return false;
   }
@@ -694,52 +723,83 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
     return false;
   }
 
-  static private boolean jj_3_4() {
-    if (jj_scan_token(INT)) return true;
+  static private boolean jj_3R_16() {
+    if (jj_scan_token(CLASS)) return true;
+    if (jj_3R_19()) return true;
+    if (jj_scan_token(LBRACE)) return true;
     return false;
   }
 
-  static private boolean jj_3R_20() {
-    if (jj_3R_18()) return true;
+  static private boolean jj_3R_24() {
+    if (jj_scan_token(BOOLEAN)) return true;
     return false;
   }
 
-  static private boolean jj_3R_19() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_3()) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(25)) {
-    jj_scanpos = xsp;
-    if (jj_3_4()) {
-    jj_scanpos = xsp;
-    if (jj_3R_20()) return true;
-    }
-    }
-    }
-    return false;
-  }
-
-  static private boolean jj_3R_18() {
+  static private boolean jj_3_9() {
+    if (jj_scan_token(NEW)) return true;
     if (jj_scan_token(IDENTIFIER)) return true;
     return false;
   }
 
-  static private boolean jj_3_3() {
-    if (jj_scan_token(INT)) return true;
-    if (jj_scan_token(LBRACK)) return true;
+  static private boolean jj_3_1() {
+    if (jj_3R_16()) return true;
     return false;
   }
 
   static private boolean jj_3_8() {
-    if (jj_scan_token(DOT)) return true;
-    if (jj_scan_token(LENGTH)) return true;
+    if (jj_scan_token(NEW)) return true;
+    if (jj_scan_token(INT)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_22() {
+    if (jj_3R_25()) return true;
     return false;
   }
 
   static private boolean jj_3_7() {
     if (jj_scan_token(DOT)) return true;
+    if (jj_scan_token(LENGTH)) return true;
+    return false;
+  }
+
+  static private boolean jj_3_6() {
+    if (jj_scan_token(DOT)) return true;
     if (jj_scan_token(IDENTIFIER)) return true;
+    return false;
+  }
+
+  static private boolean jj_3_3() {
+    if (jj_3R_18()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_18() {
+    if (jj_scan_token(INT)) return true;
+    if (jj_scan_token(LBRACK)) return true;
+    if (jj_scan_token(RBRACK)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_20() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_3()) {
+    jj_scanpos = xsp;
+    if (jj_3R_21()) {
+    jj_scanpos = xsp;
+    if (jj_3R_22()) {
+    jj_scanpos = xsp;
+    if (jj_3R_23()) return true;
+    }
+    }
+    }
+    return false;
+  }
+
+  static private boolean jj_3_5() {
+    if (jj_scan_token(IDENTIFIER)) return true;
+    if (jj_scan_token(LBRACK)) return true;
     return false;
   }
 
@@ -763,12 +823,12 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x10000,0x10000,0x6000000,0x20000,0x6000000,0x20000,0x80002880,0x400,0x2000000,0x0,0x80002880,0x80002880,0x0,0x0,0x0,0x0,0x0,0x18e00008,0x800000,0x40000020,0x20,0x18200000,0x8,0x400,0x18e00008,};
+      jj_la1_0 = new int[] {0x10000,0x10000,0x6000000,0x20000,0x6000000,0x20000,0x6000000,0x80002880,0x400,0x6000000,0x80002880,0x80002880,0x0,0x0,0x0,0x0,0x0,0x18e00008,0x800000,0x40000020,0x20,0x18200000,0x8,0x400,0x18e00008,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x40,0x0,0x40,0x0,0x40,0x0,0x0,0x40,0x40,0x0,0x1,0x2,0xc,0xc,0x10,0xc0,0x0,0x0,0x0,0xc0,0x0,0x0,0xc0,};
+      jj_la1_1 = new int[] {0x0,0x0,0x40,0x0,0x40,0x0,0x40,0x40,0x0,0x40,0x40,0x0,0x1,0x2,0xc,0xc,0x10,0xc0,0x0,0x0,0x0,0xc0,0x0,0x0,0xc0,};
    }
-  static final private JJCalls[] jj_2_rtns = new JJCalls[10];
+  static final private JJCalls[] jj_2_rtns = new JJCalls[9];
   static private boolean jj_rescan = false;
   static private int jj_gc = 0;
 
@@ -1017,7 +1077,7 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
 
   static private void jj_rescan_token() {
     jj_rescan = true;
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 9; i++) {
     try {
       JJCalls p = jj_2_rtns[i];
       do {
@@ -1033,7 +1093,6 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
             case 6: jj_3_7(); break;
             case 7: jj_3_8(); break;
             case 8: jj_3_9(); break;
-            case 9: jj_3_10(); break;
           }
         }
         p = p.next;
