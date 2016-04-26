@@ -199,36 +199,43 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
     jj_consume_token(RBRACE);
   }
 
-  static final public void FormalList() throws ParseException {
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case BOOLEAN:
-    case INT:
-    case IDENTIFIER:
-      Type();
-      jj_consume_token(IDENTIFIER);
-      label_8:
-      while (true) {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case COMMA:
-          ;
-          break;
-        default:
-          jj_la1[7] = jj_gen;
-          break label_8;
-        }
-        FormalRest();
+  static final public FormalList FormalList() throws ParseException {
+  FormalList f1 = new FormalList();
+  Formal f;
+    f = FormalParameter();
+                            fl.addElement(f);
+    label_8:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case COMMA:
+        ;
+        break;
+      default:
+        jj_la1[7] = jj_gen;
+        break label_8;
       }
-      break;
-    default:
-      jj_la1[8] = jj_gen;
-      ;
+      f = FormalRest();
+                           fl.addElement(f);
     }
+          {if (true) return fl;}
+    throw new Error("Missing return statement in function");
   }
 
-  static final public void FormalRest() throws ParseException {
+  static final public Formal FormalParameter() throws ParseException {
+  Type t;
+  Identifier i;
+    t = Type();
+    i = Identifier();
+   {if (true) return new Formal(t,i);}
+    throw new Error("Missing return statement in function");
+  }
+
+  static final public Formal FormalRest() throws ParseException {
+ Formal f;
     jj_consume_token(COMMA);
-    Type();
-    jj_consume_token(IDENTIFIER);
+    f = FormalParameter();
+         {if (true) return f;}
+    throw new Error("Missing return statement in function");
   }
 
   static final public void Type() throws ParseException {
@@ -242,7 +249,7 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
         jj_consume_token(BOOLEAN);
         break;
       default:
-        jj_la1[9] = jj_gen;
+        jj_la1[8] = jj_gen;
         if (jj_2_4(2)) {
           jj_consume_token(INT);
         } else {
@@ -251,7 +258,7 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
             Identifier();
             break;
           default:
-            jj_la1[10] = jj_gen;
+            jj_la1[9] = jj_gen;
             jj_consume_token(-1);
             throw new ParseException();
           }
@@ -282,7 +289,7 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
           ;
           break;
         default:
-          jj_la1[11] = jj_gen;
+          jj_la1[10] = jj_gen;
           break label_9;
         }
         Statement();
@@ -313,7 +320,7 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
       jj_consume_token(SEMI);
       break;
     default:
-      jj_la1[12] = jj_gen;
+      jj_la1[11] = jj_gen;
       if (jj_2_5(2)) {
         jj_consume_token(IDENTIFIER);
         jj_consume_token(ASSIGN);
@@ -347,7 +354,7 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
         ;
         break;
       default:
-        jj_la1[13] = jj_gen;
+        jj_la1[12] = jj_gen;
         break label_10;
       }
       jj_consume_token(AND);
@@ -363,7 +370,7 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
       AdditiveExp();
       break;
     default:
-      jj_la1[14] = jj_gen;
+      jj_la1[13] = jj_gen;
       ;
     }
   }
@@ -378,7 +385,7 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
         ;
         break;
       default:
-        jj_la1[15] = jj_gen;
+        jj_la1[14] = jj_gen;
         break label_11;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -389,7 +396,7 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
         jj_consume_token(MINUS);
         break;
       default:
-        jj_la1[16] = jj_gen;
+        jj_la1[15] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -406,7 +413,7 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
         ;
         break;
       default:
-        jj_la1[17] = jj_gen;
+        jj_la1[16] = jj_gen;
         break label_12;
       }
       jj_consume_token(STAR);
@@ -429,7 +436,7 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
       PostfixExp();
       break;
     default:
-      jj_la1[18] = jj_gen;
+      jj_la1[17] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -444,7 +451,7 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
         ;
         break;
       default:
-        jj_la1[19] = jj_gen;
+        jj_la1[18] = jj_gen;
         break label_13;
       }
     }
@@ -461,7 +468,7 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
         ;
         break;
       default:
-        jj_la1[20] = jj_gen;
+        jj_la1[19] = jj_gen;
         break label_14;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -471,7 +478,7 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
         jj_consume_token(RBRACK);
         break;
       default:
-        jj_la1[21] = jj_gen;
+        jj_la1[20] = jj_gen;
         if (jj_2_7(2)) {
           jj_consume_token(DOT);
           jj_consume_token(IDENTIFIER);
@@ -507,7 +514,7 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
       jj_consume_token(THIS);
       break;
     default:
-      jj_la1[22] = jj_gen;
+      jj_la1[21] = jj_gen;
       if (jj_2_9(2)) {
         jj_consume_token(NEW);
         jj_consume_token(INT);
@@ -527,7 +534,7 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
           jj_consume_token(RPAREN);
           break;
         default:
-          jj_la1[23] = jj_gen;
+          jj_la1[22] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -553,14 +560,14 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
           ;
           break;
         default:
-          jj_la1[24] = jj_gen;
+          jj_la1[23] = jj_gen;
           break label_15;
         }
         ExpRest();
       }
       break;
     default:
-      jj_la1[25] = jj_gen;
+      jj_la1[24] = jj_gen;
       ;
     }
   }
@@ -646,10 +653,27 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
     return false;
   }
 
+  static private boolean jj_3_6() {
+    if (jj_scan_token(IDENTIFIER)) return true;
+    if (jj_scan_token(LBRACK)) return true;
+    return false;
+  }
+
   static private boolean jj_3R_16() {
     if (jj_scan_token(CLASS)) return true;
     if (jj_3R_18()) return true;
     if (jj_scan_token(LBRACE)) return true;
+    return false;
+  }
+
+  static private boolean jj_3_5() {
+    if (jj_scan_token(IDENTIFIER)) return true;
+    if (jj_scan_token(ASSIGN)) return true;
+    return false;
+  }
+
+  static private boolean jj_3_1() {
+    if (jj_3R_16()) return true;
     return false;
   }
 
@@ -665,8 +689,8 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
     return false;
   }
 
-  static private boolean jj_3_1() {
-    if (jj_3R_16()) return true;
+  static private boolean jj_3_2() {
+    if (jj_3R_17()) return true;
     return false;
   }
 
@@ -707,11 +731,6 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
     return false;
   }
 
-  static private boolean jj_3_2() {
-    if (jj_3R_17()) return true;
-    return false;
-  }
-
   static private boolean jj_3_8() {
     if (jj_scan_token(DOT)) return true;
     if (jj_scan_token(LENGTH)) return true;
@@ -721,18 +740,6 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
   static private boolean jj_3_7() {
     if (jj_scan_token(DOT)) return true;
     if (jj_scan_token(IDENTIFIER)) return true;
-    return false;
-  }
-
-  static private boolean jj_3_6() {
-    if (jj_scan_token(IDENTIFIER)) return true;
-    if (jj_scan_token(LBRACK)) return true;
-    return false;
-  }
-
-  static private boolean jj_3_5() {
-    if (jj_scan_token(IDENTIFIER)) return true;
-    if (jj_scan_token(ASSIGN)) return true;
     return false;
   }
 
@@ -748,7 +755,7 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
   static private Token jj_scanpos, jj_lastpos;
   static private int jj_la;
   static private int jj_gen;
-  static final private int[] jj_la1 = new int[26];
+  static final private int[] jj_la1 = new int[25];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static {
@@ -756,10 +763,10 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x10000,0x10000,0x6000000,0x20000,0x6000000,0x20000,0x80002880,0x400,0x6000000,0x2000000,0x0,0x80002880,0x80002880,0x0,0x0,0x0,0x0,0x0,0x18e00008,0x800000,0x40000020,0x20,0x18200000,0x8,0x400,0x18e00008,};
+      jj_la1_0 = new int[] {0x10000,0x10000,0x6000000,0x20000,0x6000000,0x20000,0x80002880,0x400,0x2000000,0x0,0x80002880,0x80002880,0x0,0x0,0x0,0x0,0x0,0x18e00008,0x800000,0x40000020,0x20,0x18200000,0x8,0x400,0x18e00008,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x40,0x0,0x40,0x0,0x40,0x0,0x40,0x0,0x40,0x40,0x0,0x1,0x2,0xc,0xc,0x10,0xc0,0x0,0x0,0x0,0xc0,0x0,0x0,0xc0,};
+      jj_la1_1 = new int[] {0x0,0x0,0x40,0x0,0x40,0x0,0x40,0x0,0x0,0x40,0x40,0x0,0x1,0x2,0xc,0xc,0x10,0xc0,0x0,0x0,0x0,0xc0,0x0,0x0,0xc0,};
    }
   static final private JJCalls[] jj_2_rtns = new JJCalls[10];
   static private boolean jj_rescan = false;
@@ -783,7 +790,7 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 26; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 25; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -798,7 +805,7 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 26; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 25; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -816,7 +823,7 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 26; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 25; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -827,7 +834,7 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 26; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 25; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -844,7 +851,7 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 26; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 25; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -854,7 +861,7 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 26; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 25; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -971,7 +978,7 @@ MethodDecl m; MethodDeclList ml = new MethodDeclList();
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 26; i++) {
+    for (int i = 0; i < 25; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {

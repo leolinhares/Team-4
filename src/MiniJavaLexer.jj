@@ -125,30 +125,49 @@ VarDecl VarDecl() :
 	{return new VarDecl(t,i);}
 }
 
-void MethodDecl() :
+MethodDecl MethodDecl() :
 {
-  /*Type t; Identifier i;
+  Type t; Identifier i;
   FormalList fl = new FormalList();
   VarDecl v; VarDeclList vl = new VarDeclList();
   Statement s;
   StatementList sl = new StatementList();
-  Exp e;*/
+  Exp e;
 }
 {
-	<PUBLIC> Type() Identifier()
-	<LPAREN> FormalList() <RPAREN> <LBRACE> (LOOKAHEAD(2)VarDecl())* (Statement())* <RETURN> Exp() <SEMI> <RBRACE>
-}
-
-void FormalList() :
-{}
-{
-	(Type() <IDENTIFIER> (FormalRest())*)?
+	<PUBLIC> t = Type() i = Identifier()
+	<LPAREN> (fl = FormalList())? <RPAREN>
+	<LBRACE> (LOOKAHEAD(2) v = VarDecl(){vl.addElement(v);})*
+	(s = Statement(){sl.addElement(s);})* <RETURN> e = Exp() <SEMI> <RBRACE>
+	{return new MethodDecl(t,i,fl,vl,sl,e);}
 }
 
-void FormalRest() :
-{}
+FormalList FormalList():
 {
-	<COMMA> Type() <IDENTIFIER>
+  FormalList f1 = new FormalList();
+  Formal f;
+}
+{
+	f=FormalParameter(){fl.addElement(f);}
+	 (f = FormalRest(){fl.addElement(f);})*
+	 {return fl;}
+}
+
+
+Formal FormalParameter():
+{
+  Type t;
+  Identifier i;
+}
+{
+  t = Type() i = Identifier()
+  {return new Formal(t,i);}}
+
+Formal FormalRest() :
+{Formal f;}
+{
+	<COMMA> f = FormalParameter()
+	{return f;}
 }
 
 void Type() :
