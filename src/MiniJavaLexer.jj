@@ -144,7 +144,7 @@ MethodDecl MethodDecl() :
 
 FormalList FormalList():
 {
-  FormalList f1 = new FormalList();
+  FormalList fl = new FormalList();
   Formal f;
 }
 {
@@ -170,7 +170,7 @@ Formal FormalRest() :
 	{return f;}
 }
 
-void Type() :
+Type Type() :
 {Type t;}
 {
 	(LOOKAHEAD(3) t = ArrayType() | t = BooleanType() | t = IntegerType() | t = IdentifierType())
@@ -218,46 +218,204 @@ void Statement() :
 	LOOKAHEAD(2)<IDENTIFIER> <LBRACK> Exp() <RBRACK> <ASSIGN> Exp() <SEMI>
 }
 
-void Exp() :
+
+Exp Exp() :
+{ Exp e; }
+{
+  (
+  LOOKAHEAD( PrimaryExpression() <AND> )
+  e=AndExpression()
+|
+  LOOKAHEAD( PrimaryExpression() <LT> )
+  e=CompareExpression()
+|
+  LOOKAHEAD( PrimaryExpression() <PLUS> )
+  e=PlusExpression()
+|
+  LOOKAHEAD( PrimaryExpression() <MINUS> )
+  e=MinusExpression()
+|
+  LOOKAHEAD( PrimaryExpression() <STAR> )
+  e=TimesExpression()
+|
+  LOOKAHEAD( PrimaryExpression() <LBRACK> )
+  e=ArrayLookup()
+|
+  LOOKAHEAD( PrimaryExpression() <DOT> <LENGTH > )
+  e=ArrayLength()
+|
+  LOOKAHEAD( PrimaryExpression() <DOT> Identifier() <LPAREN> )
+  e=MessageSend()
+| 
+  e=PrimaryExpression()
+  )
+  { return e; }
+}
+
+Exp AndExpression() :
+{ Exp e1,e2; } 
+{
+  e1=PrimaryExpression() <AND> e2=PrimaryExpression()
+  { return new And(e1,e2); }
+}
+
+Exp CompareExpression() :
+{ Exp e1,e2; } 
+{
+  e1=PrimaryExpression() <LT> e2=PrimaryExpression()
+  { return new LessThan(e1,e2); }
+}
+
+Exp PlusExpression() :
+{ Exp e1,e2; } 
+{
+  e1=PrimaryExpression() <PLUS> e2=PrimaryExpression()
+  { return new Plus(e1,e2); }
+}
+
+Exp MinusExpression() :
+{ Exp e1,e2; } 
+{
+  e1=PrimaryExpression() <MINUS> e2=PrimaryExpression()
+  { return new Minus(e1,e2); }
+}
+
+Exp TimesExpression() :
+{ Exp e1,e2; } 
+{
+  e1=PrimaryExpression() <STAR> e2=PrimaryExpression()
+  { return new Times(e1,e2); }
+}
+
+Exp ArrayLookup() :
+{ Exp e1,e2; } 
+{
+  e1=PrimaryExpression() <LBRACK> e2=PrimaryExpression() <RBRACK>
+  { return new ArrayLookup(e1,e2); }
+}
+
+Exp ArrayLength() :
+{ Exp e; }
+{
+  e=PrimaryExpression() <DOT> <LENGTH>
+  { return new ArrayLength(e); }
+}
+
+Exp MessageSend() :
+{ Exp e;
+  Identifier i;
+  ExpList el = new ExpList(); 
+}
+{
+  e=PrimaryExpression() <DOT> i=Identifier() 
+  <LPAREN> ( el=ExpressionList() )? <RPAREN>
+  { return new Call(e,i,el); }
+}
+
+ExpList ExpressionList() :
+{ Exp e1,e2;
+  ExpList el = new ExpList();
+}
+{
+  e1=Exp() 
+  { el.addElement(e1); }
+  ( e2=ExpressionRest() { el.addElement(e2); })*
+  { return el; }
+}
+
+Exp ExpressionRest() :
+{ Exp e; }
+{
+  <COMMA> e=Exp()
+  { return e; }
+}
+
+Exp PrimaryExpression() :
+{ Exp e; }
+{ 
+  (
+  e=IntegerLiteral()
+|
+  e=TrueLiteral()
+|
+  e=FalseLiteral()
+|
+  e=IdentifierExp()
+|
+  e=ThisExpression()
+|
+  LOOKAHEAD(3)
+  e=ArrayAllocationExpression()
+|
+  e=AllocationExpression()
+|   
+  e=NotExpression()
+|   
+  e=BracketExpression()
+  )
+  { return e; }
+}
+
+Exp IntegerLiteral() :
+{ Token t; }
+{
+  t=<INTEGER_LITERAL>
+  { return new IntegerLiteral(Integer.parseInt(t.image)); }
+}
+
+Exp TrueLiteral() :
 {}
 {
-  	And()
+  <TRUE>
+  { return new True(); }
 }
 
-void And() :{}{	LessThan() ( <AND> LessThan() )*
-}
-
-void LessThan() :{}{	AdditiveExp()[ <LT> AdditiveExp()]
-}
-
-void AdditiveExp() :{}{	Times() ((< PLUS>|< MINUS>) Times())*
-}
-
-void Times() :{}{	PrefixExp() (<STAR> PrefixExp())*
-}
-
-void PrefixExp() :{}{	Not() | PostfixExp()
-}
-
-void Not() :{}{
-  (<NOT>)+ PostfixExp()}
-
-void PostfixExp() :{}{	PrimaryExp()(<LBRACK> Exp() <RBRACK> |
-	 LOOKAHEAD(2)<DOT> <IDENTIFIER> <LPAREN> ExpList() <RPAREN>|
-	 LOOKAHEAD(2)<DOT> <LENGTH>)*
-}
-
-void PrimaryExp() :{}{	<INTEGER_LITERAL > |	<TRUE> |	<FALSE> |	<IDENTIFIER> |	<THIS> |	LOOKAHEAD(2)<NEW> <INT> <LBRACK> Exp() <RBRACK> |	LOOKAHEAD(2)<NEW> <IDENTIFIER> <LPAREN> <RPAREN> |	<LPAREN> Exp() <RPAREN>
-}
-
-void ExpList() :
+Exp FalseLiteral() :
 {}
 {
-	(Exp() (ExpRest())*)?
+  <FALSE>
+  { return new False(); }
 }
 
-void ExpRest() :
+Exp IdentifierExp() :
+{ Token t; }
+{
+  t=<IDENTIFIER>
+  { return new IdentifierExp(t.image); }
+}
+
+Exp ThisExpression() :
 {}
 {
-	<COMMA> Exp()
+  <THIS>
+  { return new This(); }
 }
+
+Exp ArrayAllocationExpression() :
+{ Exp e; }
+{
+  <NEW> <INT> <LBRACK> e=Exp() < RBRACK >
+  { return new NewArray(e); }
+}
+
+Exp AllocationExpression() :
+{ Identifier i; }
+{
+  <NEW> i=Identifier() <LPAREN> <RPAREN>
+  { return new NewObject(i); }
+}
+
+Exp NotExpression() :
+{ Exp e; }
+{
+  <NOT> e=Exp() 
+  { return new Not(e); }
+}
+
+Exp BracketExpression() :
+{ Exp e; }
+{
+  <LPAREN>  e=Exp() <RPAREN>
+  { return e; }
+}
+
