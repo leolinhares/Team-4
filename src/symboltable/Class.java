@@ -1,78 +1,77 @@
 package symboltable;
 
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Set;
 
 import syntaxtree.IdentifierType;
 import syntaxtree.Type;
 
 public class Class {
 
-    String id;
-    Hashtable methods;
-    Hashtable globals;
-    String parent;
-    Type type;
-    
-    public Class(String id, String p) {
-	this.id = id;
-	parent = p;
-	type = new IdentifierType(id);
-	methods = new Hashtable();
-	globals = new Hashtable();
-    }
-    
-    public Class() {}
-    
-    public String getId(){ return id; }
-    
-    public Type type(){ return type; }
-    
-    public boolean addMethod(String id, Type type) {
-	if(containsMethod(id)) 
-	    return false;       
-	else {
-	    methods.put(id, new Method(id, type));
-	    return true;
+	String classID;
+	HashMap<String, Object> metodos;
+	HashMap<String, Object> variaveisGlobais;
+	String pai;
+	Type tipo;
+
+	public Class(String id, String pai) {
+		this.classID = id;
+		this.pai = pai;
+		this.tipo = new IdentifierType(id);
+		metodos = new HashMap<>();
+		variaveisGlobais = new HashMap<>();
 	}
-    }
-	
-    public Enumeration getMethods(){
-	return methods.keys();
-    }
-    
-    public Method getMethod(String id) {
-	if(containsMethod(id)) 
-	    return (Method)methods.get(id);
-	else 
-	    return null;
-    }
-	
-    public boolean addVar(String id, Type type) {
-	if(globals.containsKey(id)) 
-	    return false;
-	else{
-	    globals.put(id, new Variable(id, type));
-	    return true;
+
+	public String getId(){
+		return classID; 
 	}
-    }
-    
-    public Variable getVar(String id) {
-	if(containsVar(id)) 
-	    return (Variable)globals.get(id);
-	else 
-	    return null;
-    }
-    
-    public boolean containsVar(String id) {
-	return globals.containsKey(id);
-    }
-    
-    public boolean containsMethod(String id) {
-	return methods.containsKey(id);
-    }
-    
-    public String parent() {
-	return parent;
-    }	    
-} // Class
+	
+	//TODO: mudar para getType
+	public Type type(){
+		return tipo; 
+	}
+	
+	//TODO: mudar para getParent
+	public String parent() {
+		return pai;
+	}
+	
+	//TODO: mudar para addMetodo
+	public boolean addMethod(String id, Type tipo) {
+		if(metodos.containsKey(id)) 
+			return false;       
+		else {
+			metodos.put(id, new Method(id, tipo));
+			return true;
+		}
+	}
+
+	public Set<String> getMethods(){
+		return metodos.keySet();
+	}
+
+	public Method getMethod(String id) {
+		if(metodos.containsKey(id)) 
+			return (Method)metodos.get(id);
+		else 
+			return null;
+	}
+
+	public boolean addVar(String id, Type type) {
+		if(variaveisGlobais.containsKey(id)) 
+			return false;
+		else{
+			variaveisGlobais.put(id, new Variable(id, type));
+			return true;
+		}
+	}
+
+	public Variable getVar(String id) {
+		if(variaveisGlobais.containsKey(id)) 
+			return (Variable)variaveisGlobais.get(id);
+		else 
+			return null;
+	}
+		    
+}
+
