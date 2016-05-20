@@ -3,6 +3,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 import syntaxtree.Program;
+import visitor.ASTPrintVisitor;
 import visitor.BuildSymbolTableVisitor;
 import visitor.PrettyPrintVisitor;
 import visitor.TypeCheckVisitor;
