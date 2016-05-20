@@ -2,15 +2,13 @@ package symboltable;
 
 import java.util.HashMap;
 
-import com.sun.org.apache.xalan.internal.xsltc.compiler.CompilerException;
-
 import syntaxtree.BooleanType;
 import syntaxtree.IdentifierType;
 import syntaxtree.IntArrayType;
 import syntaxtree.IntegerType;
 import syntaxtree.Type;
 
-class SymbolTable {
+public class SymbolTable {
 	public HashMap<String, Object> hashtable;
 
 	public SymbolTable() {
