@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import syntaxtree.*;
 import visitor.*;
 import symboltable.*;
+import symboltable.BuildSymbolTableVisitor;
 
 public class Main {
     public static void main(String [] args) {
