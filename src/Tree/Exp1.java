@@ -1,1 +1,39 @@
-package Tree;import Temp.Temp;import Temp.Label;import java.util.LinkedList;public class Exp1 extends Stm {    public Exp exp;     public Exp1(Exp e) { exp=e; }    public LinkedList<Exp> kids() {	LinkedList<Exp> kids = new LinkedList<Exp>();	kids.addFirst(exp);	return kids;    }    public Stm build(LinkedList<Exp> kids) { return new Exp1(kids.getFirst()); }    public void accept(IntVisitor v, int d) { v.visit(this, d); }    public void accept(CodeVisitor v) { v.visit(this); }    public <R> R accept(ResultVisitor<R> v) { return v.visit(this); }}
+package Tree;
+
+import IR_visitor.*;
+
+public class EXP1 extends Stm
+{
+  public Exp exp;
+
+  public EXP1(Exp e)
+  {
+    exp = e;
+  }
+
+  public ExpList kids()
+  {
+    return new ExpList(exp, null);
+  }
+
+  public Stm build(ExpList kids)
+  {
+    return new EXP1(kids.head);
+  }
+
+  public String accept(StringVisitor v)
+  {
+    return v.visit(this);
+  }
+
+  public void accept(IntVisitor v, int d)
+  {
+    v.visit(this, d);
+  }
+
+  public void accept(TempVisitor v)
+  {
+    v.visit(this);
+  }
+
+}

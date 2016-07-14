@@ -1,1 +1,48 @@
-package Tree;import java.util.List;import java.util.LinkedList;public class JUMP extends Stm {    public Exp exp;    public LinkedList<Temp.Label> targets;    public JUMP(Exp e, LinkedList<Temp.Label> t) { exp=e; targets=t; }    public JUMP(Temp.Label target) {	exp = new NAME(target);	targets = new LinkedList<Temp.Label>();	targets.addFirst(target);    }    public LinkedList<Exp> kids() {	LinkedList<Exp> kids = new LinkedList<Exp>();	kids.addFirst(exp);	return kids;    }    public Stm build(LinkedList<Exp> kids) {	return new JUMP(kids.getFirst(), targets);    }    public void accept(IntVisitor v, int d) { v.visit(this, d); }    public void accept(CodeVisitor v) { v.visit(this); }    public <R> R accept(ResultVisitor<R> v) { return v.visit(this); }}
+package Tree;
+
+import IR_visitor.*;
+import Temp.Label;
+import Temp.LabelList;
+
+public class JUMP extends Stm
+{
+  public Exp       exp;
+  public LabelList targets;
+
+  public JUMP(Exp e, LabelList t)
+  {
+    exp = e;
+    targets = t;
+  }
+
+  public JUMP(Label target)
+  {
+    this(new NAME(target), new LabelList(target, null));
+  }
+
+  public ExpList kids()
+  {
+    return new ExpList(exp, null);
+  }
+
+  public Stm build(ExpList kids)
+  {
+    return new JUMP(kids.head, targets);
+  }
+
+  public String accept(StringVisitor v)
+  {
+    return v.visit(this);
+  }
+
+  public void accept(IntVisitor v, int d)
+  {
+    v.visit(this, d);
+  }
+
+  public void accept(TempVisitor v)
+  {
+    v.visit(this);
+  }
+
+}

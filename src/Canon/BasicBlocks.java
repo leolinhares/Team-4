@@ -1,61 +1,56 @@
-/* Copyright (c) 1997 Andrew W. Appel.  Licensed software: see LICENSE file */
-/* Revised 2004 by Bradford G. Nickerson to use visitors and LinkedList     */
-/*   with Generic Java compiler (gjc) (following Vids Samanta's approach).  */
 package Canon;
-import java.util.LinkedList;
 
-public class BasicBlocks {
-	public StmListList blocks;
-	public Temp.Label done;
+public class BasicBlocks
+{
+  public StmListList   blocks;
+  public Temp.Label    done;
 
-	private StmListList lastBlock;
-	private LinkedList<Tree.Stm> lastStm;
+  private StmListList  lastBlock;
+  private Tree.StmList lastStm;
 
-	private void addStm(Tree.Stm s) {
-		lastStm.add(s);
-	}
+  private void addStm(Tree.Stm s)
+  {
+    lastStm = lastStm.tail = new Tree.StmList(s, null);
+  }
 
-	private void doStms(LinkedList<Tree.Stm> l) {
-		if (l.isEmpty()) {
-			l.add(new Tree.JUMP(done));
-			doStms(new LinkedList<Tree.Stm>(l));
-		}
-		else if (l.getFirst() instanceof Tree.JUMP 
-				|| l.getFirst() instanceof Tree.CJUMP) {
-			addStm(l.removeFirst());
-			mkBlocks(l);
-		} 
-		else if (l.getFirst() instanceof Tree.LABEL) {
-			l.addFirst(new Tree.JUMP(((Tree.LABEL)l.getFirst()).label));
-			doStms(new LinkedList<Tree.Stm>(l));
-		}
-		else {
-			addStm(l.removeFirst());
-			doStms(l);
-		}
-	}
+  private void doStms(Tree.StmList l)
+  {
+    if (l == null)
+      doStms(new Tree.StmList(new Tree.JUMP(done), null));
+    else if (l.head instanceof Tree.JUMP || l.head instanceof Tree.CJUMP)
+      {
+        addStm(l.head);
+        mkBlocks(l.tail);
+      }
+    else if (l.head instanceof Tree.LABEL)
+      doStms(new Tree.StmList(new Tree.JUMP(((Tree.LABEL) l.head).label), l));
+    else
+      {
+        addStm(l.head);
+        doStms(l.tail);
+      }
+  }
 
-	void mkBlocks(LinkedList<Tree.Stm> l) {
-		if (l.isEmpty()) return;
-		else if (l.getFirst() instanceof Tree.LABEL) {
-			lastStm = new LinkedList<Tree.Stm>();
-			lastStm.add(l.getFirst());
-			if (lastBlock==null)
-				lastBlock= blocks= new StmListList(lastStm,null);
-			else
-				lastBlock = lastBlock.tail = new StmListList(lastStm,null);
-			Tree.Stm t = l.removeFirst();
-			doStms(l);
-		}
-		else {
-			l.addFirst(new Tree.LABEL(new Temp.Label()));
-			mkBlocks(new LinkedList<Tree.Stm>(l));
-		}
-	}
+  void mkBlocks(Tree.StmList l)
+  {
+    if (l == null)
+      return;
+    else if (l.head instanceof Tree.LABEL)
+      {
+        lastStm = new Tree.StmList(l.head, null);
+        if (lastBlock == null)
+          lastBlock = blocks = new StmListList(lastStm, null);
+        else
+          lastBlock = lastBlock.tail = new StmListList(lastStm, null);
+        doStms(l.tail);
+      }
+    else
+      mkBlocks(new Tree.StmList(new Tree.LABEL(new Temp.Label()), l));
+  }
 
-	public BasicBlocks(LinkedList<Tree.Stm> stms) {
-		done = new Temp.Label();
-		mkBlocks(stms);
-	}
-
+  public BasicBlocks(Tree.StmList stms)
+  {
+    done = new Temp.Label();
+    mkBlocks(stms);
+  }
 }

@@ -1,1 +1,28 @@
-package Assem;import Temp.Temp;import Temp.Label;import java.util.List;public class LABEL extends Instr {	public Label label;	public LABEL(String a, Label l) {		assem = a;		use = null;		def = null;		jumps = null;		label = l;	}}
+package Assem;
+
+public class LABEL extends Instr
+{
+  public Temp.Label label;
+
+  public LABEL(String a, Temp.Label l)
+  {
+    assem = a;
+    label = l;
+  }
+
+  public Temp.TempList use()
+  {
+    return null;
+  }
+
+  public Temp.TempList def()
+  {
+    return null;
+  }
+
+  public Targets jumps()
+  {
+    return null;
+  }
+
+}

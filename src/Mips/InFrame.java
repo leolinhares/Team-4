@@ -1,27 +1,1 @@
-package Mips;
-
-import Frame.Access;
-import Tree.Exp;
-
-public class InFrame extends Access {
-	int offset;
-	
-	
-	public InFrame(int offset) {
-		super();
-		this.offset = offset;
-	}
-
-	@Override
-	public String toString() {
-		// TODO Auto-generated method stub
-		return Integer.toString(offset);
-	}
-
-	@Override
-	public Exp exp(Exp e) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-}
+package Mips;public class InFrame extends Frame.Access{  int offset;  InFrame(int o)  {    offset = o;  }  public Tree.Exp exp(Tree.Exp fp)  {    return new Tree.MEM(new Tree.BINOP(Tree.BINOP.PLUS, fp, new Tree.CONST(offset)));  }  public String toString()  {    Integer offset = new Integer(this.offset);    return offset.toString();  }}

@@ -1,27 +1,1 @@
-package Mips;
-
-import Frame.Access;
-import Temp.Temp;
-import Tree.Exp;
-
-public class InReg extends Access {
-	Temp temp;
-
-	
-	public InReg(Temp temp) {
-		super();
-		this.temp = temp;
-	}
-
-	@Override
-	public String toString() {
-		// TODO Auto-generated method stub
-		return temp.toString();
-	}
-
-	@Override
-	public Exp exp(Exp e) {
-		return new Tree.TEMP(temp);
-	}
-
-}
+package Mips;import Temp.Temp;public class InReg extends Frame.Access{  Temp temp;  InReg(Temp t)  {    temp = t;  }  public Tree.Exp exp(Tree.Exp fp)  {    return new Tree.TEMP(temp);  }  public String toString()  {    return temp.toString();  }}

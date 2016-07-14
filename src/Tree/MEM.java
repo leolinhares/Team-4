@@ -1,1 +1,40 @@
-package Tree;import Temp.Temp;import Temp.Label;import java.util.LinkedList;public class MEM extends Exp {    public Exp exp;    public MEM(Exp e) { exp=e; }    public LinkedList<Exp> kids() {	LinkedList<Exp> kids = new LinkedList<Exp>();	kids.addFirst(exp);	return kids;    }    public Exp build(LinkedList<Exp> kids) { return new MEM(kids.getFirst()); }    public void accept(IntVisitor v, int d) { v.visit(this, d); }    public Temp accept(CodeVisitor v) { return v.visit(this); }    public <R> R accept(ResultVisitor<R> v) { return v.visit(this); }}
+package Tree;
+
+import IR_visitor.*;
+import Temp.Temp;
+
+public class MEM extends Exp
+{
+  public Exp exp;
+
+  public MEM(Exp e)
+  {
+    exp = e;
+  }
+
+  public ExpList kids()
+  {
+    return new ExpList(exp, null);
+  }
+
+  public Exp build(ExpList kids)
+  {
+    return new MEM(kids.head);
+  }
+
+  public String accept(StringVisitor v)
+  {
+    return v.visit(this);
+  }
+
+  public void accept(IntVisitor v, int d)
+  {
+    v.visit(this, d);
+  }
+
+  public Temp accept(TempVisitor v)
+  {
+    return v.visit(this);
+  }
+
+}

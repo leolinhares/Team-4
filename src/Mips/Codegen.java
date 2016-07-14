@@ -1,107 +1,108 @@
 package Mips;
 
-import java.util.ListIterator;
-
 import Assem.Instr;
-import Temp.Temp;
-import Tree.BINOP;
-import Tree.CALL;
-import Tree.CJUMP;
-import Tree.CONST;
-import Tree.ESEQ;
-import Tree.Exp1;
-import Tree.ExpCall;
-import Tree.JUMP;
-import Tree.LABEL;
-import Tree.MEM;
-import Tree.MOVE;
-import Tree.MoveCall;
-import Tree.NAME;
-import Tree.SEQ;
-import Tree.TEMP;
+import Assem.InstrList;
+import Assem.LABEL;
+import Assem.MOVE;
+import Assem.OPER;
+import IR_visitor.TempVisitor;
 
-public class Codegen implements Tree.CodeVisitor{
-	private MipsFrame mipsFrame;
-    private ListIterator<Instr> listIterator;
-	public Codegen(MipsFrame mipsFrame, ListIterator<Instr> listIterator) {
-		// TODO Auto-generated constructor stub
-		this.mipsFrame = mipsFrame;
-		this.listIterator = listIterator;
-	}
-	@Override
-	public void visit(SEQ n) {
-		// TODO Auto-generated method stub
-		
-	}
-	@Override
-	public void visit(LABEL n) {
-		// TODO Auto-generated method stub
-		
-	}
-	@Override
-	public void visit(JUMP n) {
-		// TODO Auto-generated method stub
-		
-	}
-	@Override
-	public void visit(CJUMP n) {
-		// TODO Auto-generated method stub
-		
-	}
-	@Override
-	public void visit(MOVE n) {
-		// TODO Auto-generated method stub
-		
-	}
-	@Override
-	public void visit(Exp1 n) {
-		// TODO Auto-generated method stub
-		
-	}
-	@Override
-	public Temp visit(BINOP n) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	@Override
-	public Temp visit(MEM n) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	@Override
-	public Temp visit(TEMP n) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	@Override
-	public Temp visit(ESEQ n) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	@Override
-	public Temp visit(NAME n) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	@Override
-	public Temp visit(CONST n) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	@Override
-	public Temp visit(CALL n) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	@Override
-	public Temp visit(MoveCall n) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	@Override
-	public Temp visit(ExpCall n) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+public class Codegen implements TempVisitor
+{
 
+  private InstrList codeList, listTail;
+  private MipsFrame frame;
+
+  public Codegen(MipsFrame f)
+  {
+    frame = f;
+    codeList = listTail = null;
+  }
+
+  public InstrList codegen(Tree.Stm s)
+  {
+    s.accept(this);
+    InstrList result = codeList;
+    codeList = listTail = null;
+    return result;
+  }
+
+  /* Assumes instructions are generated in reverse order. */
+  private void emit(Instr instr)
+  {
+    if (listTail == null)
+      listTail = codeList = new InstrList(instr, null);
+    else
+      listTail = listTail.tail = new InstrList(instr, null);
+  }
+
+  public void visit(Tree.SEQ n)
+  {
+    throw new Error("There should be no SEQ nodes in a canonical IR tree.");
+  }
+
+  public void visit(Tree.LABEL n)
+  {
+    emit(new LABEL(n.label.toString() + ":\n", n.label));
+  }
+
+  public void visit(Tree.JUMP n)
+  {
+    // TO DO: fill in
+  }
+
+  public void visit(Tree.CJUMP n)
+  {
+    // TO DO: fill in
+  }
+
+  public void visit(Tree.MOVE n)
+  {
+    // TO DO: fill in
+  }
+
+  public void visit(Tree.EXP1 n)
+  {
+    n.exp.accept(this);
+  }
+
+  public Temp.Temp visit(Tree.BINOP n)
+  {
+    // TO DO: fill in
+    return null;
+  }
+
+  public Temp.Temp visit(Tree.MEM n)
+  {
+    // TO DO: fill in
+    return null;
+  }
+
+  public Temp.Temp visit(Tree.TEMP n)
+  {
+    return n.temp;
+  }
+
+  public Temp.Temp visit(Tree.ESEQ n)
+  {
+    throw new Error("There should be no ESEQ nodes in a canonical IR tree.");
+  }
+
+  /* Assumes NAME node is handled in visit methods for JUMP and CALL. */
+  public Temp.Temp visit(Tree.NAME n)
+  {
+    throw new Error("In well-formed MiniJava program, NAME node is never visited outside of JUMP and CALL.");
+  }
+
+  public Temp.Temp visit(Tree.CONST n)
+  {
+    // TO DO: fill in
+    return null;
+  }
+
+  public Temp.Temp visit(Tree.CALL n)
+  {
+    // TO DO: fill in
+    return null;
+  }
 }

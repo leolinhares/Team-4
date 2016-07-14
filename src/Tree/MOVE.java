@@ -1,1 +1,46 @@
-package Tree;import Temp.Temp;import Temp.Label;import java.util.LinkedList;public class MOVE extends Stm {    public Exp dst, src;    public MOVE(Exp d, Exp s) { dst=d; src=s; }    public LinkedList<Exp> kids() {	LinkedList<Exp> kids = new LinkedList<Exp>();        if (dst instanceof MEM) {	    kids.addFirst(((MEM)dst).exp);	    kids.addLast(src);	} else	    kids.addFirst(src);	return kids;    }    public Stm build(LinkedList<Exp> kids) {        if (dst instanceof MEM)	    return new MOVE(new MEM(kids.getFirst()), kids.getLast());	else return new MOVE(dst, kids.getFirst());    }    public void accept(IntVisitor v, int d) { v.visit(this, d); }    public void accept(CodeVisitor v) { v.visit(this); }    public <R> R accept(ResultVisitor<R> v) { return v.visit(this); }}
+package Tree;
+
+import IR_visitor.*;
+
+public class MOVE extends Stm
+{
+  public Exp dst, src;
+
+  public MOVE(Exp d, Exp s)
+  {
+    dst = d;
+    src = s;
+  }
+
+  public ExpList kids()
+  {
+    if (dst instanceof MEM)
+      return new ExpList(((MEM) dst).exp, new ExpList(src, null));
+    else
+      return new ExpList(src, null);
+  }
+
+  public Stm build(ExpList kids)
+  {
+    if (dst instanceof MEM)
+      return new MOVE(new MEM(kids.head), kids.tail.head);
+    else
+      return new MOVE(dst, kids.head);
+  }
+
+  public String accept(StringVisitor v)
+  {
+    return v.visit(this);
+  }
+
+  public void accept(IntVisitor v, int d)
+  {
+    v.visit(this, d);
+  }
+
+  public void accept(TempVisitor v)
+  {
+    v.visit(this);
+  }
+
+}

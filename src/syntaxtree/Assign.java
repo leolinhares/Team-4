@@ -1,6 +1,7 @@
 package syntaxtree;
 import visitor.Visitor;
 import visitor.TypeVisitor;
+import visitor.ExpVisitor;
 
 public class Assign extends Statement {
   public Identifier i;
@@ -15,6 +16,10 @@ public class Assign extends Statement {
   }
 
   public Type accept(TypeVisitor v) {
+    return v.visit(this);
+  }
+  
+  public Translate.Exp accept(ExpVisitor v) {
     return v.visit(this);
   }
 }
