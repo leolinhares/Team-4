@@ -6,6 +6,9 @@ import Assem.LABEL;
 import Assem.MOVE;
 import Assem.OPER;
 import IR_visitor.TempVisitor;
+import Temp.Temp;
+import Temp.TempList;
+import Tree.CONST;
 
 public class Codegen implements TempVisitor {
 
@@ -44,12 +47,56 @@ public class Codegen implements TempVisitor {
 		// JUMP(Tree.NAME, List<Label>)
 		// JUMP(Exp, List<Label>)
 
+		if (n.exp instanceof Tree.NAME) {
+			Tree.NAME name = (Tree.NAME)n.exp;
+			emit(new OPER("b " + name.label.toString(), null, null, n.targets));
+			return;
+		}
+		emit(new OPER("jr `s0", null, null, n.targets));
 	}
 
-	public void visit(Tree.CJUMP n) {
+	public void visit(Tree.CJUMP s) {
 		// CJUMP(op, Exp, CONST, Label, Label)
 		// CJUMP(op, Exp, Exp, Label, Label)
-
+		Tree.CONST left = (CONST) s.left;
+		Tree.CONST right = (CONST) s.right;
+		if (left == null)
+			return;
+		if (right == null) {
+			s.left = s.right;
+			s.right = left;
+			switch (s.relop) {
+			case Tree.CJUMP.EQ:
+			case Tree.CJUMP.NE:
+				break;
+			case Tree.CJUMP.LT:
+				s.relop = Tree.CJUMP.GT;
+				break;
+			case Tree.CJUMP.GE:
+				s.relop = Tree.CJUMP.LE;
+				break;
+			case Tree.CJUMP.GT:
+				s.relop = Tree.CJUMP.LT;
+				break;
+			case Tree.CJUMP.LE:
+				s.relop = Tree.CJUMP.GE;
+				break;
+			case Tree.CJUMP.ULT:
+				s.relop = Tree.CJUMP.UGT;
+				break;
+			case Tree.CJUMP.UGE:
+				s.relop = Tree.CJUMP.ULE;
+				break;
+			case Tree.CJUMP.UGT:
+				s.relop = Tree.CJUMP.ULT;
+				break;
+			case Tree.CJUMP.ULE:
+				s.relop = Tree.CJUMP.UGE;
+				break;
+			default:
+				throw new Error("");
+			}
+		}
 	}
 
 	public void visit(Tree.MOVE n) {
@@ -71,42 +118,58 @@ public class Codegen implements TempVisitor {
 		n.exp.accept(this);
 	}
 
-	public Temp.Temp visit(Tree.BINOP n) {
-		// TO DO: fill in
+	public Temp visit(Tree.BINOP e) {
+		TempList t = new TempList(null, null);
+
+		int right = ((Tree.CONST)e.right).value;
+		switch (e.binop) {
+		case Tree.BINOP.PLUS:
+		{
+			Temp left = (e.left instanceof Tree.TEMP) ?
+					((Tree.TEMP)e.left).temp : e.left.accept(this);
+					String off = Integer.toString(right);
+					if (left == frame.FP()) {
+						left = frame.SP;
+						off += "+" + frame.name + "_framesize";
+					}
+					emit(new OPER("add `d0 `s0 " + off, t,null));
+					return null;
+		}
+		}
 		return null;
 	}
 
-	public Temp.Temp visit(Tree.MEM n) {
-	    // MEM(+ Exp CONST)
-	    // MEM(CONST)
-	    // MEM(TEMP)
-	    // MEM(Exp)
+	public Temp visit(Tree.MEM n) {
+		// MEM(+ Exp CONST)
+		// MEM(CONST)
+		// MEM(TEMP)
+		// MEM(Exp)
 
 		return null;
 	}
 
-	public Temp.Temp visit(Tree.TEMP n) {
-		
-		
+	public Temp visit(Tree.TEMP n) {
+
+
 		return n.temp;
 	}
-	
 
-	public Temp.Temp visit(Tree.ESEQ n) {
+
+	public Temp visit(Tree.ESEQ n) {
 		throw new Error("There should be no ESEQ nodes in a canonical IR tree.");
 	}
 
 	/* Assumes NAME node is handled in visit methods for JUMP and CALL. */
-	public Temp.Temp visit(Tree.NAME n) {
+	public Temp visit(Tree.NAME n) {
 		throw new Error("In well-formed MiniJava program, NAME node is never visited outside of JUMP and CALL.");
 	}
 
-	public Temp.Temp visit(Tree.CONST n) {
+	public Temp visit(Tree.CONST n) {
 		// TO DO: fill in
 		return null;
 	}
 
-	public Temp.Temp visit(Tree.CALL n) {
+	public Temp visit(Tree.CALL n) {
 		// TO DO: fill in
 		return null;
 	}
