@@ -382,7 +382,6 @@ public class Translate implements ExpVisitor
 
 	public Exp visit(Not n)
 	{
-		/* ADD CODE -- don't return null */
 		return null;
 	}
 
