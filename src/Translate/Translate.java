@@ -35,47 +35,37 @@ import syntaxtree.True;
 import syntaxtree.VarDecl;
 import syntaxtree.While;
 import visitor.ExpVisitor;
+import Tree.*;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 
 import Frame.Access;
+import Temp.Label;
+import Temp.Temp;
 
 public class Translate implements ExpVisitor
 {
 
-	/* linked list of accumulated procedure fragments */
-	private Frag                     frags     = null;
-	private Frag                     frags_tail = null;
+	private Frag frags     = null;
+	private Frag frags_tail = null;
 
-	/* current frame */
-	private Frame.Frame              currFrame = null;
+	private Frame.Frame currFrame = null;
 
-	/* pointer to address in heap at which instance variables are 
-   stored, for current class (i.e., "this") */
-	private Tree.Exp                 objPtr    = null;
+	private Tree.Exp objPtr = null;
 
-	/* current offset from pointer to class object 
-   (set to 0 in visit(ClassDecl), used in visit(VarDecl)) */
-	private int                      offset;
+	private int offset;
 
-	/* hashtable of field (instance) variables--key is variable name 
-   string, value is offset from pointer to class object */
 	private HashMap<String, Integer> fieldVars = null;
 
-	/* hashtable of local and formal variables--key is variable name
-   string, value is Access object to describe location of 
-   variable (InFrame or InReg) */
-	private HashMap<String, Access>  vars      = null;
+	private HashMap<String, Access> vars = null;
 
-	/* constructor: set currFrame and start visitor */
 	public Translate(Program p, Frame.Frame f)
 	{
 		currFrame = f;
 		p.accept(this);
 	}
 
-	/* add function with frame=currFrame and body to list of 
-   ProcFrag objects, frags. */
 	public void procEntryExit(Tree.Stm body)
 	{
 		ProcFrag newfrag = new ProcFrag(body, currFrame);
@@ -85,19 +75,13 @@ public class Translate implements ExpVisitor
 			frags_tail.next = newfrag;
 		frags_tail = newfrag;
 
-		/* original code
-    newfrag.next = frags;
-    frags = newfrag; */
 	}
 
-	/* public method for retrieving linked list of accumulated 
-   procedure fragments */
 	public Frag getResults()
 	{
 		return frags;
 	}
 
-	/* public method for printing body (IR tree) of each procedure */
 	public void printResults()
 	{
 		Tree.Print p = new Tree.Print(System.out);
@@ -111,7 +95,6 @@ public class Translate implements ExpVisitor
 		}
 	}
 
-	/* simply visit all class declarations */
 	public Exp visit(Program n)
 	{
 		n.m.accept(this);
@@ -120,31 +103,24 @@ public class Translate implements ExpVisitor
 		return null;
 	}
 
-	/* setup new frame and visit statement in body */
 	public Exp visit(MainClass n)
 	{
-		/* setup new frame for main method */
 		Frame.Frame newFrame = currFrame.newFrame("main", 1);
 		Frame.Frame oldFrame = currFrame;
 		currFrame = newFrame;
 
-		/* visit single statement in method body */
 		Tree.Stm s = (n.s.accept(this)).unNx();
 
-		/* there is no return expression, so return 0
-     then create Tree.MOVE to store return value */
 		Tree.Exp retExp = new Tree.CONST(0);
 		Tree.Stm body = new Tree.MOVE(new Tree.TEMP(currFrame.RV()), new Tree.ESEQ(s, retExp));
 
-		/* create new procedure fragment for method and add to list */
 		procEntryExit(body);
 		currFrame = oldFrame;
 
 		return null;
 	}
 
-	/* prepare HashMap fieldVars so we can add to it in visit(VarDecl),
-   set back to null at end */
+
 	public Exp visit(ClassDeclSimple n)
 	{
 		fieldVars = new HashMap<String, Integer>();
@@ -157,16 +133,19 @@ public class Translate implements ExpVisitor
 		return null;
 	}
 
-	/* do not bother with this node, since we are not handling
-   inheritance */
 	public Exp visit(ClassDeclExtends n)
 	{
+		fieldVars = new HashMap<String, Integer>();
+		offset = -1 * currFrame.wordSize();
+		for (int i = 0; i < n.vl.size(); i++)
+			n.vl.elementAt(i).accept(this);
+		for (int i = 0; i < n.ml.size(); i++)
+			n.ml.elementAt(i).accept(this);
+		fieldVars = null;
 		return null;
 	}
 
-	/* if VarDecl in ClassDecl, add offset from class object pointer to 
-   HashMap fieldVars
-   else if VarDecl in MethodDecl, allocate local and add to HashMap vars */
+
 	public Exp visit(VarDecl n)
 	{
 		if (vars == null)
@@ -179,32 +158,16 @@ public class Translate implements ExpVisitor
 
 	public Exp visit(MethodDecl n)
 	{
-		/* setup new frame for method */
 		Frame.Frame newFrame = currFrame.newFrame(n.i.toString(), n.fl.size() + 1);
 		Frame.Frame oldFrame = currFrame;
 		currFrame = newFrame;
 
-		/* add locals to HashMap vars */
 		for (int i = 0; i < n.vl.size(); i++)
 			n.vl.elementAt(i).accept(this);
 
-		/* ADD CODE: move formals to fresh temps and add them to the HashMap vars */
 
-		/* ADD CODE: set value of Tree.Exp objPtr
-     Recall that objPtr is a pointer to the address in memory at which 
-     instance variables are stored for the current class 
-     (i.e., it is "this").
-     In the MiniJava compiler, it is passed as an argument during all
-     calls to MiniJava methods. */
+		Tree.Stm body = null; 
 
-		/* ADD CODE: visit each statement in method body, 
-     creating new Tree.SEQ nodes as needed */
-		Tree.Stm body = null; // FILL IN
-
-		/* ADD CODE: get return expression and group with statements of body,
-     then create Tree.MOVE to store return value */
-
-		/* create new procedure fragment for method and add to list */
 		procEntryExit(body);
 		currFrame = oldFrame;
 		vars = null;
@@ -213,59 +176,86 @@ public class Translate implements ExpVisitor
 		return null;
 	}
 
-	/* these nodes are never reached by visitor */
 	public Exp visit(Formal n)
 	{
+		n.i.accept(this);
+		n.t.accept(this);
 		return null;
 	}
 
 	public Exp visit(IntArrayType n)
 	{
+		n.accept(this);
 		return null;
 	}
 
 	public Exp visit(BooleanType n)
 	{
+		n.accept(this);
 		return null;
 	}
 
 	public Exp visit(IntegerType n)
 	{
+		n.accept(this);
 		return null;
 	}
 
 	public Exp visit(IdentifierType n)
 	{
+		n.accept(this);
 		return null;
 	}
 
 	public Exp visit(Block n)
 	{
-		/* ADD CODE -- don't return null */
+		n.accept(this);
 		return null;
 	}
 
 	public Exp visit(If n)
 	{
-		/* ADD CODE -- don't return null */
-		return null;
+		Label T = new Label();
+		Label F = new Label();
+		Label D = new Label();
+		Exp exp =  n.e.accept(this);
+		Exp stmT =  n.s1.accept(this);
+		Exp stmF =  n.s2.accept(this);
+		return new Nx(new SEQ
+				(new SEQ
+						(new SEQ
+								(new SEQ
+										(new CJUMP(Tree.CJUMP.EQ,exp.unEx(),new CONST(1), T,F),
+												new SEQ(new LABEL(T),stmT.unNx())),
+										new JUMP(D)),
+								new SEQ(new LABEL(F),stmF.unNx())),
+						new LABEL(D)));
 	}
 
 	public Exp visit(While n)
 	{
-		/* ADD CODE -- don't return null */
-		return null;
+		Label test = new Label();
+		Label T = new Label();
+		Label F = new Label();
+		Exp exp = n.e.accept(this);
+		Exp body = n.s.accept(this);
+
+		return new Nx(new SEQ
+				(new SEQ
+						(new SEQ(new LABEL(test),
+								(new CJUMP(Tree.CJUMP.EQ, exp.unEx(),
+										new CONST(1),T,F))),
+								(new SEQ( new LABEL(T),body.unNx()))),
+						new LABEL(F)));
 	}
 
-	/* call external print function, passing integer expression as argument */
 	public Exp visit(Print n)
 	{
 		Tree.Exp e = (n.e.accept(this)).unEx();
 		return new Ex(currFrame.externalCall("printInt", new Tree.ExpList(e, null)));
 	}
 
-	/* get appropriate Tree.Exp node for identifier (set as Tree.MOVE dst),
-   set expression as Tree.MOVE src */
+
 	public Exp visit(Assign n)
 	{
 		Tree.Exp e = (n.e.accept(this)).unEx();
@@ -274,129 +264,208 @@ public class Translate implements ExpVisitor
 
 	public Exp visit(ArrayAssign n)
 	{
-		/* ADD CODE -- don't return null */
-		return null;
+		Exp _ret=null;
+
+		Tree.Exp e1 = n.e1.accept(this).unEx();
+
+		if (!(e1 instanceof Tree.TEMP)){
+			Temp taux1= new Temp();
+			Temp taux2= new Temp();
+			e1= new ESEQ
+					(new SEQ
+							(new MOVE(new TEMP(taux1),new BINOP(Tree.BINOP.MUL,e1,new CONST(4))),
+									new MOVE(new TEMP(taux2),
+											new MEM(new BINOP(Tree.BINOP.PLUS,new TEMP(taux2),new TEMP(taux1))))),
+							new TEMP(taux2));
+		}
+
+		Tree.Exp e2 = n.e2.accept(this).unEx();
+		Temp t = new Temp();
+		Temp t_index = new Temp();
+		Temp t_size = new Temp();
+		ExpList args1 = null;
+		Label T = new Label();
+		Label F = new Label();
+
+		e2 = new ESEQ
+				(new SEQ
+						(new SEQ
+								(new SEQ
+										(new SEQ
+												(new SEQ
+														(new MOVE(new TEMP(t_index),
+																new BINOP(Tree.BINOP.MUL,e2,new CONST(4))),
+																new MOVE(new TEMP(t_size),new MEM(e1))),
+														new CJUMP(Tree.CJUMP.GE,new TEMP(t_index),new TEMP(t_size),T,F)),
+												new LABEL(T)),
+										new MOVE(new TEMP(new Temp()),
+												new CALL(new NAME(new Label("_error")), args1))),
+								new LABEL(F)),
+						new TEMP(t_index));
+
+		Tree.Exp e3 = n.i.accept(this).unEx();
+
+		return new Nx
+				(new MOVE
+						(new MEM
+								(new BINOP
+										(Tree.BINOP.PLUS,e1,new BINOP
+												(Tree.BINOP.PLUS,e2,new CONST(4)))),
+								e3));
 	}
 
 	public Exp visit(And n)
 	{
-		/* ADD CODE --don't return null */
-		return null;
+		return n.accept(this);
 	}
 
 	public Exp visit(LessThan n)
 	{
-		/* ADD CODE -- don't return null */
-		return null;
+		return n.accept(this);
 	}
 
 	public Exp visit(Plus n)
 	{
-		/* ADD CODE -- don't return null */
-		return null;
+		return n.accept(this);
 	}
 
 	public Exp visit(Minus n)
 	{
-		/* ADD CODE -- don't return null */
-		return null;
+		return n.accept(this);
 	}
 
 	public Exp visit(Times n)
 	{
-		/* ADD CODE -- don't return null */
-		return null;
+		return n.accept(this);
 	}
 
 	public Exp visit(ArrayLookup n)
 	{
-		/* ADD CODE -- don't return null */
-		return null;
+		Temp t_index = new Temp();
+		Temp t_size = new Temp();
+		Tree.Exp e1 = n.e1.accept(this).unEx();
+		Tree.Exp e2 = n.e2.accept(this).unEx();
+
+		Label F = new Label();
+		Label T = new Label();
+
+		ExpList args1 = null;
+
+		Tree.Stm s1 =
+				new SEQ
+				(new SEQ
+						(new SEQ
+								(new SEQ
+										(new SEQ
+												(new MOVE(new TEMP(t_index),new BINOP(Tree.BINOP.MUL,e2,new CONST(4))),
+														new MOVE(new TEMP(t_size),new MEM(e1))),
+												new CJUMP(Tree.CJUMP.GE,new TEMP(t_index),new TEMP(t_size),T,F)),
+										new LABEL(T)),
+								new MOVE(new TEMP(new Temp()),
+										new CALL(new NAME(new Label("_error")),args1))),
+						new LABEL(F));
+
+		Temp t = new Temp();
+		Tree.Stm s2 = new SEQ
+				(s1,new MOVE(new TEMP(t),new MEM
+						(new BINOP(Tree.BINOP.PLUS,e1,new BINOP
+								(Tree.BINOP.PLUS,
+										new BINOP(Tree.BINOP.MUL,e2,new CONST(4))
+										,new CONST(4))))));
+		return new Ex(new ESEQ(s2,new TEMP(t)));
 	}
 
 	public Exp visit(ArrayLength n)
 	{
-		/* ADD CODE -- don't return null */
-		return null;
+		return n.e.accept(this);
 	}
 
 	public Exp visit(Call n)
 	{
-		/* ADD CODE -- don't return null */
 		return null;
 	}
 
 	public Exp visit(IntegerLiteral n)
 	{
-		/* ADD CODE -- don't return null */
-		return null;
+		return new Ex(new CONST(n.i));
 	}
 
 	public Exp visit(True n)
 	{
-		/* ADD CODE -- don't return null */
-		return null;
+		return new Ex(new CONST(1));
 	}
 
 	public Exp visit(False n)
 	{
-		/* ADD CODE -- don't return null */
-		return null;
+		return new Ex(new CONST(0));
 	}
 
-	/* get appropriate Tree.Exp node for identifier */
 	public Exp visit(IdentifierExp n)
 	{
 		return new Ex(getIdTree(n.s));
 	}
 
-	/* return pointer to address in heap at which instance variables are 
-   stored, for current class */
+
 	public Exp visit(This n)
 	{
 		return new Ex(objPtr);
 	}
 
-	/* call external "alloc" function, pass the number of bytes
-   needed ((array length + 1) * wordsize) as the argument,
-   initialize the value of each array element to 0,
-   store the array length with the array */ 
+
 	public Exp visit(NewArray n)
 	{
-		/* ADD CODE
-     (Note: use currFrame.externalCall("alloc", new Tree.ExpList(...))) 
-     -- don't return null */
-		return null;
+		Temp t1 = new Temp();
+		Temp t2 = new Temp();
+		Label cj = new Label();
+		Label F = new Label();
+		Label T = new Label();
+
+		Exp exp1 = n.e.accept(this);
+
+		Tree.Exp size =new BINOP
+				(Tree.BINOP.MUL,
+						new BINOP(Tree.BINOP.PLUS,exp1.unEx(),new CONST(1)),
+						new CONST(4));
+		ExpList args1 = null;
+		Tree.Stm s1 =new MOVE
+				(new TEMP(t1),
+						new CALL(new NAME(new Label("_halloc")),args1));
+
+		Tree.Stm s2 =
+				new SEQ
+				(new SEQ
+						(new SEQ
+								(new SEQ
+										(new SEQ
+												(new SEQ
+														(new MOVE(new TEMP(t2),new CONST(4)),
+																new SEQ (new LABEL(cj),new CJUMP(Tree.CJUMP.LT,new TEMP(t2),size,F,T))),
+														new LABEL(T)),
+												new MOVE(new MEM(new BINOP(Tree.BINOP.PLUS,new TEMP(t1),new TEMP(t2))),new CONST(0))),
+										new MOVE(new TEMP(t2),new BINOP(Tree.BINOP.PLUS,new TEMP(t2),new CONST(4)))),
+								new JUMP(cj)),
+						new SEQ(new LABEL(F),new MOVE(new MEM(new TEMP(t1)),new BINOP(Tree.BINOP.MUL,exp1.unEx(),new CONST(4)))));
+
+		return new Ex(new ESEQ(new SEQ(s1,s2),new TEMP(t1)));
 	}
 
-	/* call external "alloc" function, pass the number of bytes
-   needed (number of instance variables * wordsize) as
-   the argument, initialize each instance variable to 0 */  
 	public Exp visit(NewObject n)
 	{
-		/* ADD CODE
-     (Note: you will need to get the number of field variables from your
-     symbol table)  -- don't return null */
 		return null;
 	}
 
 	public Exp visit(Not n)
 	{
-		return null;
+		return new Ex
+				   (new BINOP(Tree.BINOP.MINUS, new CONST(1),
+					  (n.e.accept(this)).unEx()));
 	}
 
-	/* node never reached by visitor */
 	public Exp visit(Identifier n)
 	{
 		return null;
 	}
 
-	/* if id is a local or formal variable (i.e., vars.get(id) returns an Access
-   object), return result of calling exp()--Tree.MEM if InFrame, 
-   Tree.TEMP if InReg
-   else if id is a field (instance) variable, get its offset from class
-   object pointer and return Tree.MEM 
-	 **For demonstration of this method, see visit(Assign) and visit(Identifier). */
 	private Tree.Exp getIdTree(String id)
 	{
 		Frame.Access a = vars.get(id);
